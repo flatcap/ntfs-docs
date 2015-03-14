@@ -1,13 +1,14 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-    <meta name="description" content="NTFS Documentation">
-    <link rel="icon" href="../style/ntfsicon.png" type="image/png">
-    <link rel="stylesheet" type="text/css" href="../style/ntfsdoc.css">
-    <link rel="stylesheet" type="text/css" href="../style/glossary.css">
-    <link rel="start" type="text/html" href="../index.html" title="NTFS Documentation">
-    <link rel="contents" href="../index.html">
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta name="description" content="NTFS Documentation" />
+    <link rel="icon" href="../style/ntfsicon.png" type="image/png" />
+    <link rel="stylesheet" type="text/css" href="../style/ntfsdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../style/glossary.css" />
+    <link rel="start" type="text/html" href="../index.html" title="NTFS Documentation" />
+    <link rel="contents" href="../index.html" />
     <title>Glossary - NTFS Documentation</title>
   </head>
 
@@ -63,7 +64,7 @@
         The permission will be one of <q>Access Allowed</q>, <q>Access Denied</q>
         or <q>System Audit</q>.  This object has flags to determine how the
         permissions should be inherited.
-        <br>See also:
+        <br />See also:
         <a href="#sid">SID</a>,
         <a href="#acl">ACL</a> and
         <a href="#audit">Auditing</a>
@@ -73,7 +74,7 @@
       <dt>Access Control List (ACL)</dt>
         <dd>
         This security structure contains a list of ACEs.
-        <br>See also:
+        <br />See also:
         <a href="#security_descriptor">$SECURITY_DESCRIPTOR</a>,
         <a href="#sid">SID</a>,
         <a href="#acl">ACL</a> and
@@ -106,7 +107,7 @@
         attributes won't fit in a single MFT File Record.  It has a list
         of all the attributes and where they can be found.  The $ATTRIBUTE_LIST
         is always stored in the Base FILE Record.
-        <br>See also:
+        <br />See also:
         <a href="#file_record">File Record</a>
         <a href="#mft">$MFT</a>
         <a href="#base_file_record">Base FILE Record</a>
@@ -122,12 +123,12 @@
         </dd>
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="b"></a></dd>
 
-      <dd><a name="b+_tree"></a></dd>
+      <dd><a name="bplus_tree"></a></dd>
       <dt>B+ Tree</dt>
         <dd>
         A B+ tree is a variant of the binary tree.
@@ -137,7 +138,7 @@
         the efficiency of a binary tree and also performs well
         with large numbers of data elements (because the tree tends
         to grow wide rather than deep).
-        <br>See also:
+        <br />See also:
         <a href="#binary_tree">Binary Tree</a> and
         <a href="#balanced_tree">Balanced Tree</a>.
         </dd>
@@ -158,7 +159,7 @@
         "INDX" == index buffer
         RSTR &amp; ???
         </pre>
-        <br>See also:
+        <br />See also:
         <a href="#chkdsk">chkdsk</a> and
         <a href="#fsck">fsck</a>.
         </dd>
@@ -167,7 +168,7 @@
       <dt>$Bad</dt>
         <dd>
         This is the named Data Stream representing bad clusters on a volume.
-        <br>See also:
+        <br />See also:
         <a href="#badclus">$BadClus</a>.
         </dd>
 
@@ -184,8 +185,8 @@
         Often binary trees can become very uneven.  By reorganising
         the data, the tree can be balanced such that no a node has
         similar numbers of children to it's left and right.
-        <br>See also:
-        <a href="#b+_tree">B+ Tree</a> and
+        <br />See also:
+        <a href="#bplus_tree">B+ Tree</a> and
         <a href="#binary_tree">Binary Tree</a>.
         </dd>
 
@@ -195,7 +196,7 @@
         If the attributes don't fit into a single MFT record
         then the Base FILE Record holds enough information to
         locate the other records.
-        <br>See also:
+        <br />See also:
         <a href="#attribute_list">$ATTRIBUTE_LIST</a>,
         <a href="#file_record">FILE Record</a> and
         <a href="#mft">$MFT</a>.
@@ -207,7 +208,7 @@
         Maths carried out in base two.  In this documentation, certain flags
         fields are represented in binary, for the sake of clarity.  e.g.
         00001000<sub>2</sub>, 010000000<sub>2</sub>.
-        <br>See also:
+        <br />See also:
         <a href="#decimal">Decimal</a>,
         <a href="#hex">Hex</a> and
         <a href="#units">Units</a>.
@@ -220,8 +221,8 @@
         Each node in the tree represents a data element.
         The left child node is a collection of all the elements that come before it.
         The right child node is a collection of all the elements that come after it.
-        <br>See also:
-        <a href="#b+_tree">B+ Tree</a> and
+        <br />See also:
+        <a href="#bplus_tree">B+ Tree</a> and
         <a href="#balanced_tree">Balanced Tree</a>.
         </dd>
 
@@ -229,7 +230,7 @@
       <dt>Bit</dt>
         <dd>
         One binary digit, one or zero.
-        <br>See also:
+        <br />See also:
         <a href="#units">Units</a>,
         </dd>
 
@@ -274,7 +275,7 @@
       <dt>Byte <a href="#units">(See Units)</a></dt>
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="c"></a></dd>
@@ -284,7 +285,7 @@
         <dd>
         This is a DOS and Windows utility to check and repair filesystems.
         Its name is an abbreviation of check disk.
-        <br>See also:
+        <br />See also:
         <a href="#fsck">fsck</a>.
         </dd>
 
@@ -295,7 +296,7 @@
         and it is a multiple of the sector size.
         It is determined when the volume is formatted and
         cannot be altered afterwards.
-        <br>See also:
+        <br />See also:
         <a href="#sector">Sector</a>,
         <a href="#boot">$Boot</a> and
         <a href="#volume">Volume</a>.
@@ -308,7 +309,7 @@
         The compression is performed transparently when the file
         is read or written.  Any new files in a compressed
         directory will automatically be compressed.
-        <br>See also:
+        <br />See also:
         <a href="#compression_unit">Compression Unit</a>
         </dd>
 
@@ -321,13 +322,13 @@
         it is left uncompressed.  This division also helps accessing
         a file randomly, ie it isn't necessary to decompress the whole
         file.
-        <br>See also:
+        <br />See also:
         <a href="#cluster"></a>
         <a href="#compression"></a>
         </dd>
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="d"></a></dd>
@@ -346,7 +347,7 @@
         Non-resident attributes are stored in intervals of clusters called runs.
         Each run is represented by its starting cluster and its length.
         The runs map the VCNs of a file to the LCNs of a volume.
-        <br>See also:
+        <br />See also:
         <a href="#attribute">Attribute</a>,
         <a href="#cluster">Cluster</a>,
         <a href="#lcn">LCN</a>,
@@ -361,7 +362,7 @@
         numbers that are neither in <a href="#hex">hex</a>, nor
         <a href="#binary">binary</a>, are in decimal,
         e.g.  16 (sixteen), 23 (twenty-three).
-        <br>See also:
+        <br />See also:
         <a href="#binary">Binary</a>,
         <a href="#hex">Hex</a> and
         <a href="#units">Units</a>.
@@ -398,7 +399,7 @@
         </dd>
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="e"></a></dd>
@@ -423,7 +424,7 @@
       <dt>$EFS</dt>
         <dd>
         $EFS is the named $LOGGED_UTILITY_STREAM of any encrypted file.
-        <br>See also:
+        <br />See also:
         <a href="#logged_utility_stream">$LOGGED_UTILITY_STREAM</a>.
         </dd>
 
@@ -438,7 +439,7 @@
         </dd>
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="f"></a></dd>
@@ -471,7 +472,7 @@
         NTFS supports the standard set of DOS file permissions, namely
         <q>Archive</q>, <q>System</q>, <q>Hidden</q> and <q>Read Only</q>.
         In addition, NTFS supports <q>Compressed</q> and <q>Encrypted</q>.
-        <br>See also:
+        <br />See also:
         <a href="#security_descriptor">$SECURITY_DESCRIPTOR</a> and
         <a href="#compression">Compression</a>
         </dd>
@@ -484,7 +485,7 @@
         header and a list of attributes.  If the attributes don't
         fit into a single record, then more records will be used
         and a $ATTRIBUTE_LIST attribute will be needed.
-        <br>See also:
+        <br />See also:
         <a href="#attribute">Attribute</a>,
         <a href="#attribute_list">Attribute List</a>,
         <a href="#magic_number">Magic Number</a> and
@@ -509,7 +510,7 @@
         this number is incremented.  The sequence number can
         help detect errors on the volume.
 
-        <br>See also:
+        <br />See also:
         <a href="#file_record">File Record</a>,
         <a href="#mft">$MFT</a> and
         <a href="#volume">Volume</a>.
@@ -563,7 +564,7 @@
         </dd>
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="g"></a></dd>
@@ -600,7 +601,7 @@
 
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="h"></a></dd>
@@ -610,7 +611,7 @@
         <dd>
         Maths carried out in base sixteen.  In this documentation,
         many numbers represented in hex, e.g. 0x02E0, 0xF100.
-        <br>See also:
+        <br />See also:
         <a href="#binary">Binary</a>,
         <a href="#decimal">Decimal</a> and
         <a href="#units">Units</a>.
@@ -639,7 +640,7 @@
       <dt>HPFS <a href="#hpfs">(See High Performance File System)</a></dt>
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="i"></a></dd>
@@ -649,7 +650,7 @@
         <dd>
         This is the named index used by directories.
         The name refers to attribute 0x30 ($FILE_NAME).
-        <br>See also:
+        <br />See also:
         <a href="#attribute">Attribute</a>,
         <a href="#directory">Directory</a>,
         <a href="#file_name">$FILE_NAME</a> and
@@ -684,7 +685,7 @@
         Index records are used by directories, $Quota, $Reparse
         and $Secure.  The contents depend on the type of index
         being kept.  Directories store $FILE_NAME attributes.
-        <br>See also:
+        <br />See also:
         <a href="#directory">Directory</a>,
         <a href="#i30">$I30</a>,
         <a href="#quota">$Quota</a>,
@@ -697,7 +698,7 @@
         <dd>
         Something contained in $LogFile. It consists of a
         sequence of 4KB log records.
-        <br>See also:
+        <br />See also:
         <a href="#logfile">$LogFile</a>
         </dd>
 
@@ -706,7 +707,7 @@
         <dd>
         An inode is the filesystems representation of a file, directory, device, etc.
         In NTFS every inode it represented by an MFT FILE record.
-        <br>See also:
+        <br />See also:
         <a href="#directory">Directory</a>,
         <a href="#file">File</a>,
         <a href="#file_record">FILE Record</a> and
@@ -714,14 +715,14 @@
         </dd>
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="j"></a></dd>
       <dt>$J</dt>
         <dd>
         $J is a named data stream of the Metadata File $UsnJrnl.
-        <br>See also:
+        <br />See also:
         <a href="#usnjrnl">$UsnJrnl</a>
         </dd>
 
@@ -732,7 +733,7 @@
         </dd>
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="k"></a></dd>
@@ -741,7 +742,7 @@
       <dt>KB <a href="#units">(See Units)</a></dt>
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="l"></a></dd>
@@ -757,7 +758,7 @@
         imagine they waste 4KB if they only have to log a few bytes. Custer
         mentions high level and low level 'records'. High level are: - allocate
         inode n, - make a directory entry foo in directory m low level are: -
-        modify inode n with the new contents of <1KB>]
+        modify inode n with the new contents of &lt;1KB&gt;]
         </dd>
 
       <dd><a name="logfile"></a></dd>
@@ -785,7 +786,7 @@
         <dd>
         A volume is divided into clusters.  They are
         numbered sequentially, starting at zero.
-        <br>See also:
+        <br />See also:
         <a href="#cluster">Cluster</a> and
         <a href="#volume">Volume</a>.
         </dd>
@@ -800,7 +801,7 @@
       <dt>LSN <a href="#lsn">(See Logical Sequence Number)</a></dt>
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="m"></a></dd>
@@ -820,7 +821,7 @@
       <dt>$Max</dt>
         <dd>
         $Max is a named Data Stream of $UsnJrnl.
-        <br>See also:
+        <br />See also:
         <a href="#usnjrnl">$UsnJrnl</a>
         </dd>
 
@@ -873,7 +874,7 @@
         <dd>
         $MountMgrDatabase is a named Data Stream of dot (the root directory).
         It contains a list of mounted volumes.
-        <br>See also:
+        <br />See also:
         <a href="#dot">Dot, Root Directory</a>.
         </dd>
 
@@ -889,7 +890,7 @@
         </dd>
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="n"></a></dd>
@@ -906,7 +907,7 @@
         The NT Authority defines the scope of the security identifier.
         Numbers 0&nbsp;-&nbsp;4 represent internal identifiers, e.g.
         World, Local.  5 represents the NT Authority.
-        <br>See also:
+        <br />See also:
         <a href="#nt_sub_authority">NT Sub Authority</a>
         <a href="#sid">SID</a>
         <a href="#security_descriptor">$SECURITY_DESCRIPTOR</a>
@@ -916,7 +917,7 @@
       <dt>NTFS <a href="../attributes/volume_information.html">(More...) </a></dt>
         <dd>
         NTFS is the file system of Windows NT, Windows 2000 and Windows XP.
-        <br>See also:
+        <br />See also:
         <a href="#filesystem">Filesystem</a>
         </dd>
 
@@ -931,14 +932,14 @@
         </dd>
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="o"></a></dd>
       <dt>$O</dt>
         <dd>
         This is one of the named indexes belonging to $Quota and $ObjId.
-        <br>See also:
+        <br />See also:
         <a href="#index">Index</a>,
         <a href="#q">$Q</a>,
         <a href="#objid">$ObjId</a> and
@@ -960,7 +961,7 @@
         </dd>
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="p"></a></dd>
@@ -992,7 +993,7 @@
         <q>Read Only</q> and <q>Hidden</q>.
         The other is based on ACEs and allows granting specific
         permissions to specific users.
-        <br>See also:
+        <br />See also:
         <a href="#ace">$ACE</a>,
         <a href="#file_permissions">File Permissions</a> and
         <a href="#security_descriptor">$SECURITY_DESCRIPTOR</a>
@@ -1016,14 +1017,14 @@
         </dd>
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="q"></a></dd>
       <dt>$Q</dt>
         <dd>
         This is one of the named indexes belonging to $Quota.
-        <br>See also:
+        <br />See also:
         <a href="#index">Index</a>,
         <a href="#o">$O</a> and
         <a href="#quota">$Quota</a>.
@@ -1037,14 +1038,14 @@
         </dd>
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="r"></a></dd>
       <dt>$R</dt>
         <dd>
         This is the named index belonging to $Reparse.
-        <br>See also:
+        <br />See also:
         <a href="#index">Index</a>,
         <a href="#reparse">$Reparse</a>.
         </dd>
@@ -1054,7 +1055,7 @@
         <dd>
         This record is used in the $LogFile.  Each represents
         an atomic transaction that is to be performed.
-        <br>See also:
+        <br />See also:
         <a href="#logfile">$LogFile</a> and
         <a href="#transaction">Transaction</a>
         </dd>
@@ -1065,7 +1066,7 @@
         There are several record types in NTFS.
         FILE Record are used in the $MFT, INDX Records in indexes,
         RCRD and RSTR Records in the $LogFile.
-        <br>See also:
+        <br />See also:
         <a href="#file_record">FILE Record</a>,
         <a href="#indx_record">INDX Record</a>,
         <a href="#rcrd_record">RCRD Record</a> and
@@ -1100,7 +1101,7 @@
         <dd>
         In MacOS's filesystem, HFS, files are allowed to have multiple
         data streams.  These are called resource forks.
-        <br>See also:
+        <br />See also:
         <a href="#hfs">HFS</a> and
         <a href="#stream">Stream</a>.
         </dd>
@@ -1113,7 +1114,7 @@
         consulted and transactions are undone until the disk returns
         to a consistant state.  This does not guarantee data integrity,
         only disk integrity.
-        <br>See also:
+        <br />See also:
         <a href="#logfile">$LogFile</a>,
         <a href="#transaction">Transaction</a> and
         <a href="#volume">Volume</a>.
@@ -1136,7 +1137,7 @@
       <dt>Runs <a href="#data_runs">(See Data Runs)</a></dt>
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="s"></a></dd>
@@ -1145,7 +1146,7 @@
       <dt>$SDH</dt>
         <dd>
         This is one of the named indexes belonging to $Secure.
-        <br>See also:
+        <br />See also:
         <a href="#index">Index</a>,
         <a href="#sii">$SII</a> and
         <a href="#secure">$Secure</a>.
@@ -1155,7 +1156,7 @@
       <dt>$SDS</dt>
         <dd>
         This is the named data stream belonging to $Secure.
-        <br>See also:
+        <br />See also:
         <a href="#secure">$Secure</a> and
         <a href="#stream">Stream</a>
         </dd>
@@ -1181,7 +1182,7 @@
         There are two levels of security in NTFS.
         There are the DOS File Permissions, such as <q>Read Only</q> and <q>Hidden</q>
         and an ACL model which grants specific permissions to specific users.
-        <br>See also:
+        <br />See also:
         <a href="#ace">ACE</a>,
         <a href="#acl">ACL</a>,
         <a href="#permissions">Permissions</a>,
@@ -1195,7 +1196,7 @@
         This attribute stores all the security information about a file or
         directory.  It contains an ACL for auditing, an ACL for permissions and
         a SID to show the user and group of the owner.
-        <br>See also:
+        <br />See also:
         <a href="#attribute">Attribute</a>,
         <a href="#acl">ACL</a>,
         <a href="#ace">ACE</a> and
@@ -1207,7 +1208,7 @@
         <dd>
         This variable-length identifier uniquely identifies a user
         or a group on an NT domain.  It is used in the security permissions.
-        <br>See also:
+        <br />See also:
         <a href="#ace">ACE</a>,
         <a href="#acl">ACL</a> and
         <a href="#security_descriptor">$SECURITY_DESCRIPTOR</a>.
@@ -1222,7 +1223,7 @@
       <dt>$SII</dt>
         <dd>
         This is one of the named indexes belonging to $Secure.
-        <br>See also:
+        <br />See also:
         <a href="#index">Index</a>,
         <a href="#sdh">$SDH</a> and
         <a href="#secure">$Secure</a>.
@@ -1235,7 +1236,7 @@
         blocks of zeros, then NTFS can choose to not waste any space storing
         these portions on disk.  They are represented as data runs containing
         nothing.  When read from disk, NTFS simply substitutes zeros.
-        <br>See also:
+        <br />See also:
         <a href="#data_runs">Data Runs</a>.
         </dd>
 
@@ -1265,7 +1266,7 @@
         </dd>
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="t"></a></dd>
@@ -1316,7 +1317,7 @@
         assumed to be the one and only correct interpretation.
         </pre>
 
-        <br>See also:
+        <br />See also:
         <a href="#file_record">File Record</a>
         </dd>
 
@@ -1335,7 +1336,7 @@
         </dd>
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="u"></a></dd>
@@ -1356,7 +1357,7 @@
         <dd>
         Every size in this document is measured in bytes (unless clearly marked).
         The abbreviations for sizes are:
-        <br><br>
+        <br /><br />
 
         <table border="1" summary="" cellspacing="0">
           <tr>
@@ -1391,7 +1392,7 @@
           </tr>
         </table>
 
-        <br>
+        <br />
         <pre>see also Binary, Decimal, Hexadecimal</pre>
 
         N.B. Technically, the correct abbreviation for 1024 bytes
@@ -1434,7 +1435,7 @@
         (usa_count * 2) has to be less than or equal to 510.
         </pre>
 
-        <br>See also:
+        <br />See also:
         <a href="#file_record">FILE Record</a>
         <a href="#indx_record">INDX Record</a>
         <a href="#rcrd_record">RCRD Record</a>
@@ -1448,7 +1449,7 @@
         </dd>
     </dl>
 
-    <hr>
+    <hr />
 
     <dl>
       <dd><a name="v"></a></dd>
@@ -1462,7 +1463,7 @@
         are given virtual cluster numbers.  Cluster zero refers
         to the first cluster of the file.  The data runs map the
         VCNs to LCNs so that the file can be located on the volume.
-        <br>See also:
+        <br />See also:
         <a href="#cluster">Cluster</a>,
         <a href="#lcn">LCN</a> and
         <a href="#volume">Volume</a>.
@@ -1514,11 +1515,8 @@
       <dd><a name="z"></a></dd>
     </dl>
 
-    <br>
+    <br />
     <a class="contact" href="../help/license.html">Copyright &copy;</a>
-    <a class="contact" href="http://validator.w3.org/check?uri=referer">Validate HTML</a>
-    <a class="contact" href="http://jigsaw.w3.org/css-validator/validator?uri=referer">Validate CSS</a>
-    <img src="http://sourceforge.net/sflogo.php?group_id=13956" width="1" height="1" border="0" alt="SourceForge">
   </body>
 </html>
 
