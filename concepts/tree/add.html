@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <link rel="stylesheet" type="text/css" href="../../style/ntfsdoc.css">
+    <link rel="icon" href="../../style/ntfsicon.png" type="image/png">
+    <link rel="start" type="text/html" href="../../index.html" title="NTFS Documentation">
+    <link rel="up" href="index.html" title="B*Trees - NTFS Directory Trees">
+    <link rel="next" href="del.html" title="Deleting nodes">
+    <link rel="previous" href="index.html" title="B*Trees - NTFS Directory Trees">
+    <link rel="contents" href="../../index.html">
+    <title>Adding, NTFS Directory Trees - Concept - NTFS Documentation</title>
+  </head>
+  <body>
+    <table border="0" class="toolbar" summary="" cellspacing="0">
+      <tr>
+        <td class="toolbar"><div class="toolbar"><a accesskey="1" class="toolbar" href="../../index.html">Home</a></div></td>
+        <td class="toolbar"><div class="toolbar"><a accesskey="2" class="toolbar" href="../../files/index.html">Files</a></div></td>
+        <td class="toolbar"><div class="toolbar"><a accesskey="3" class="toolbar" href="../../attributes/index.html">Attributes</a></div></td>
+        <td class="toolbar"><div class="toolbar"><a accesskey="4" class="toolbar" href="../../concepts/index.html">Concepts</a></div></td>
+        <td class="toolbar"><a accesskey="5" class="toolbar" href="../help/glossary.html">Glossary</a></td>
+      </tr>
+    </table>
+
+  <h1>Concept - B*Trees - NTFS Directory Trees</h1>
+  <a class="prevnext" accesskey="," href="index.html">Previous</a>
+  <a class="prevnext" accesskey="." href="del.html">Next</a>
+
+  <p>
+  <a class="visible" href="index.html">Home</a>
+  <a class="visible" href="add.html">Add</a>
+  <a class="visible" href="del.html">Delete</a>
+  </p>
+
+  <h2>Adding nodes in B*Trees - NTFS Directory Trees</h2>
+
+  <a name="add01"></a>
+  <div class="figure">Figure 1</div>
+  <img src="add/01.png"><br>
+  <p>
+  First we start with an empty node.  It contains just the dummy key.  In this
+  case the node is the root node and the keys are leaves.
+  </p>
+
+  <a name="add02"></a>
+  <div class="figure">Figure 2</div>
+  <img src="add/02.png"><br>
+  <p>
+  The first few add cases are simple.  Here, <q>A</q> is added.
+  </p>
+
+  <a name="add03"></a>
+  <div class="figure">Figure 3</div>
+  <img src="add/03.png"><br>
+  <p>
+  Now <q>E</q> is added.  The keys are kept in order.  The dummy key always
+  comes last.
+  </p>
+
+  <a name="add04"></a>
+  <div class="figure">Figure 4</div>
+  <img src="add/04.png"><br>
+  <p>
+  Another add, <q>I</q>.  The node is now full.
+  </p>
+
+  <a name="add05"></a>
+  <div class="figure">Figure 5</div>
+  <img src="add/05.png"><br>
+  <p>
+  When we add <q>O</q>, we find that the node overflows.  We create two new nodes,
+  a parent and a sibling (on our right).  We also find the median key, <q>E</q>.
+  </p>
+
+  <a name="add06"></a>
+  <div class="figure">Figure 6</div>
+  <img src="add/06.png"><br>
+  <p>
+  Next we promote the median key to the parent and attach ourselves as its
+  child.
+  </p>
+
+  <a name="add07"></a>
+  <div class="figure">Figure 7</div>
+  <img src="add/07.png"><br>
+  <p>
+  Finally we transfer all the keys greater than the median to the right-hand
+  sibling.  The operation is complete.  We now have a new root node, containing
+  <q>E</q>.  The leaves (keys with no children) are <q>A</q>, <q>I</q> and
+  <q>O</q>.
+  </p>
+
+  <a name="add08"></a>
+  <div class="figure">Figure 8</div>
+  <img src="add/08.png"><br>
+  <p>
+  After adding <q>B</q>, <q>C</q> and <q>L</q> both the children nodes are now
+  full.
+  </p>
+
+  <a name="add09"></a>
+  <div class="figure">Figure 9</div>
+  <img src="add/09.png"><br>
+  <p>
+  Adding <q>D</q> we overfill the node.  This time we already have a parent, so
+  when we promote the median, <q>B</q>, to the parent.  We will always need a
+  new right-hand sibling.
+  </p>
+
+  <a name="add10"></a>
+  <div class="figure">Figure 10</div>
+  <img src="add/10.png"><br>
+  <p>
+  Here we add <q>K</q> and we find that the newly inserted key is the median
+  itself.  This is no different.
+  </p>
+
+  <a name="add11"></a>
+  <div class="figure">Figure 11</div>
+  <img src="add/11.png"><br>
+  <p>
+  Fill another node with <q>F</q> and <q>G</q> for the final example.
+  </p>
+
+  <a name="add12"></a>
+  <div class="figure">Figure 12</div>
+  <img src="add/12.png"><br>
+  <p>
+  We add <q>J</q> but the node is too full, so we promote <q>G</q> and split the
+  node.
+  </p>
+
+  <a name="add13"></a>
+  <div class="figure">Figure 13</div>
+  <img src="add/13.png"><br>
+  <p>
+  Unfortunately, the node we've just promoted a key too is now too full.  So
+  we'll have to split that node as well.  The median is <q>E</q>.
+  </p>
+
+  <a name="add14"></a>
+  <div class="figure">Figure 14</div>
+  <img src="add/14.png"><br>
+  <p>
+  Ignoring the children of this node, this promotion is exactly like the
+  promotion in Figures 5,6,7.  Now the tree is 3 nodes deep.
+  </p>
+
+  <p>
+  Now have a look at the <a href="del.html">delete cases</a>.
+  </p>
+
+    <br>
+    <a class="contact" href="../help/license.html">Copyright (C)</a>
+    <a class="contact" href="http://validator.w3.org/check?uri=http://linux-ntfs.sourceforge.net/ntfs/concepts/index.html">Validate HTML</a>
+    <a class="contact" href="http://jigsaw.w3.org/css-validator/validator?uri=http://linux-ntfs.sourceforge.net/ntfs/concepts/index.html">Validate CSS</a>
+    <img src="http://sourceforge.net/sflogo.php?group_id=13956" width="1" height="1" border="0" alt="SourceForge">
+
+  </body>
+</html>
+

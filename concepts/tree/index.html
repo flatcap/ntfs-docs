@@ -1,0 +1,340 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <link rel="stylesheet" type="text/css" href="../../style/ntfsdoc.css">
+    <link rel="icon" href="../../style/ntfsicon.png" type="image/png">
+    <link rel="start" type="text/html" href="../../index.html" title="NTFS Documentation">
+    <link rel="up" href="../index.html">
+    <link rel="next" href="../clusters.html">
+    <link rel="previous" href="../attribute_id.html">
+    <link rel="contents" href="../../index.html">
+    <title>B*Trees - NTFS Directory Trees - Conecpt - NTFS Documentation</title>
+  </head>
+  <body>
+
+    <table border="0" class="toolbar" summary="" cellspacing="0">
+      <tr>
+        <td class="toolbar"><div class="toolbar"><a accesskey="1" class="toolbar" href="../../index.html">Home</a></div></td>
+        <td class="toolbar"><div class="toolbar"><a accesskey="2" class="toolbar" href="../../files/index.html">Files</a></div></td>
+        <td class="toolbar"><div class="toolbar"><a accesskey="3" class="toolbar" href="../../attributes/index.html">Attributes</a></div></td>
+        <td class="toolbar"><div class="toolbar"><a accesskey="4" class="toolbar" href="../../concepts/index.html">Concepts</a></div></td>
+        <td class="toolbar"><a accesskey="5" class="toolbar" href="../../help/glossary.html">Glossary</a></td>
+      </tr>
+    </table>
+
+  <h1>Concept - B*Trees - NTFS Directory Trees</h1>
+  <a class="prevnext" accesskey="," href="../attribute_id.html">Previous</a>
+  <a class="prevnext" accesskey="." href="../clusters.html">Next</a>
+
+  <p>
+  <a class="visible" href="index.html">Home</a>
+  <a class="visible" href="add.html">Add</a>
+  <a class="visible" href="del.html">Delete</a>
+  </p>
+
+  <h3>References</h3>
+
+  <p>
+  Here are some sites that I found helpful whilst
+  writing the B-Tree code.
+  </p>
+
+  <table border="0">
+  <tr>
+      <td><a href="http://tide.it.bond.edu.au/inft320/003/lectures/physical.htm">http://tide.it.bond.edu.au/inft320/003/lectures/physical.htm</a></td>
+  </tr>
+  <tr>
+      <td><a href="http://cis.stvincent.edu/carlsond/swdesign/btree/btree.html">http://cis.stvincent.edu/carlsond/swdesign/btree/btree.html</a></td>
+  </tr>
+  <!--
+  <tr>
+      <td><a href="http://www.public.asu.edu/~peterjn/btree">http://www.public.asu.edu/~peterjn/btree</a></td>
+  </tr>
+  broken
+  <tr>
+      <td><a href="http://www.autoobjects.com/Home/Teaching/CmpE_126/CmpE_126_Lectures/B-Tree/b-tree.html">http://www.autoobjects.com/Home/Teaching/CmpE_126/CmpE_126_Lectures/B-Tree/b-tree.html</a></td>
+  </tr>
+  -->
+  <tr>
+      <td><a href="http://www.fit.qut.edu.au/~maire/baobab/baobab.html">http://www.fit.qut.edu.au/~maire/baobab/baobab.html</a></td>
+  </tr>
+  <tr>
+      <td><a href="http://www.fit.qut.edu.au/~maire/baobab/lecture/index.htm">http://www.fit.qut.edu.au/~maire/baobab/lecture/index.htm</a></td>
+  </tr>
+  </table>
+
+
+  <h3>Basic Terminology</h3>
+
+  <dl>
+    <dt>Key</dt>
+    <dd>An object bearing data</dd>
+    <dt>Leaf</dt>
+    <dd>A key with no children</dd>
+    <dt>Node</dt>
+    <dd>A collection of keys</dd>
+    <dt>Order</dt>
+    <dd>A node of order n, has a maximum of n-1 keys</dd>
+    <dt>Tree</dt>
+    <dd>An ordered data structure</dd>
+    <dt>Root Node</dt>
+    <dd>A node with no parent</dd>
+    <dt>Median</dt>
+    <dd>The ceil((n-1)/2)th key in a node</dd>
+    <dt>Siblings</dt>
+    <dd>Two keys in the same node, or two nodes with the same parent</dd>
+    <dt>Depth</dt>
+    <dd>The number of layers in the tree.  Grandparent, parents, children = 3</dd>
+    <dt>b-tree</dt>
+    <dd>A balanced tree</dd>
+    <dt>b+tree</dt>
+    <dd>A balanced tree whose nodes are at least 1/2 full</dd>
+    <dt>b*tree</dt>
+    <dd>A balanced tree whose nodes are at least 2/3 full</dd>
+    <!--
+    <dt>Successor</dt>
+    <dd>...</dd>
+    <dt>Deficient Node</dt>
+    <dd>...</dd>
+    -->
+  </dl>
+
+  <h3>Overview</h3>
+
+  <p>
+  B+Trees 
+  </p>
+
+  <pre>
+  fixed order
+  height balanced
+  during add/remove of keys
+  minimal disturbance
+  pointers downwards only
+  </pre>
+  
+  <h3>NTFS Trees</h3>
+
+  <p>
+  <pre>
+      index root
+      index allocation
+      dummy keys
+      data in non-leaf keys
+      on-disk pointer only point down
+
+  What we have so far
+
+      ...
+
+  Overview
+
+      ...
+
+  Add Rules
+
+      Find the first key that is larger than the new key
+      (this will be a necessarily be a leaf)
+      Insert the new key before this key (in the same node)
+      While the node is full
+	  Split the current node in two
+	  Promote the median key to the parent
+	  Now consider the parent
+      End
+    
+  Delete Rules
+
+      Delete the key
+      If the key had children
+	  Find the successor and move it to this node
+	  Now consider the successor's old node
+      End
+      While the node isn't full enough
+	  If a sibling has enough keys
+	    steal one
+	  Else
+	    Combine with one of the sibling
+	  End
+      End
+  </pre>
+  </p>
+
+  <h3>Examples</h3>
+
+  <p>
+  This is a set of examples covering all the mechanisms for a B+Tree.  There are
+  other combinations which are the mirror images of some of the examples.
+  </p>
+
+  <p>
+  All the examples have nodes with order 4, i.e a maximum of 4 keys.  With
+  higher orders, some other manipulations will be necessary.
+  </p>
+
+  <p>
+  In each of the examples, a node (cyan) contains one or more keys (white,
+  named).  Each node is terminated with a dummy key (exclamation mark) which is
+  lexicographically higher in any comparisons with normal key names.
+  </p>
+
+  <p>
+    <table border="0">
+    <tr>
+      <td>
+      	<a class="visible" href="add.html">Add</a>
+      </td>
+      <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+      <td>
+	<a href="add.html#add01">01</a>
+	<a href="add.html#add02">02</a>
+	<a href="add.html#add03">03</a>
+	<a href="add.html#add04">04</a>
+	<a href="add.html#add05">05</a>
+	<a href="add.html#add06">06</a>
+	<a href="add.html#add07">07</a>
+	<a href="add.html#add08">08</a>
+	<a href="add.html#add09">09</a>
+	<a href="add.html#add10">10</a>
+	<a href="add.html#add11">11</a>
+	<a href="add.html#add12">12</a>
+	<a href="add.html#add13">13</a>
+	<a href="add.html#add14">14</a>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      	<a class="visible" href="del.html">Delete</a>
+      </td>
+      <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+      <td>
+	<a href="del.html#del01">01</a>
+	<a href="del.html#del02">02</a>
+	<a href="del.html#del03">03</a>
+	<a href="del.html#del04">04</a>
+	<a href="del.html#del05">05</a>
+	<a href="del.html#del06">06</a>
+	<a href="del.html#del07">07</a>
+      </td>
+    </tr>
+    </table>
+  </p>
+
+  <h3>How to debug</h3>
+
+  <p>
+  Here's a picture of flatcap <a class="visible" href="work.png">debugging the code</a> using <a class="visible" href="http://www.gnu.org/software/ddd/">ddd - The Data Display Debugger</a>.
+  </p>
+
+  <h3>Discussion</h3>
+
+  <p>
+  A discussion log from #ntfs on IRC.
+  </p>
+
+  <p>
+  <table>
+  <tr><td valign="top">flatcap</td><td>hi _Oracle_</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>hi there</td></tr>
+  <tr><td valign="top">flatcap</td><td>anything I can do for you?</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>I was wondering about the B+ trees of ntfs</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>they seem to be a bit awkward, or at least - not what I expected :)</td></tr>
+  <tr><td valign="top">flatcap</td><td>they _do_ seem strange, but they are perfect for filesystems</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>no, i meant their on-disk representation</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>they have a dummy node of sorts?</td></tr>
+  <tr><td valign="top">flatcap</td><td>the trees in ntfs aren't proper b+trees</td></tr>
+  <tr><td valign="top">flatcap</td><td>a dummy key</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>that's exactly what I was hoping to hear!</td></tr>
+  <tr><td valign="top">flatcap</td><td>(thinking is still a bit hard this morning, bear with me :-)</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>no problem ;-)</td></tr>
+  <tr><td valign="top">flatcap</td><td>the trees consist of a node, which contains keys</td></tr>
+  <tr><td valign="top">flatcap</td><td>the keys in a real (ideal world) b+tree are just separators, and the data is only stored in the leaves</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>right</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>btw - how big is a node under ntfs? i mean, how many keys fit in there?</td></tr>
+  <tr><td valign="top">flatcap</td><td>the INDX record is 4k, an you can get 10's of filenames in it</td></tr>
+  <tr><td valign="top">flatcap</td><td>but..., that depends on the lengths of the filenames</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>i thought the number of keys in a node was a fixed property of a b+ tree?</td></tr>
+  <tr><td valign="top">flatcap</td><td>hehe, usually, yes</td></tr>
+  <tr><td valign="top">flatcap</td><td>the keys of ntfs actually contain data and also a pointer to their children</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>so i noticed</td></tr>
+  <tr><td valign="top">AntonA</td><td>one should add that INDX records of 2k size have also been seen in the wild -- by me (-:</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>really? </td></tr>
+  <tr><td valign="top">_Oracle_</td><td>what OS?</td></tr>
+  <tr><td valign="top">AntonA</td><td>NT4</td></tr>
+  <tr><td valign="top">flatcap</td><td>because there's one more child than key, there has to be a dummy key (no data, but has children)</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>interesting...</td></tr>
+  <tr><td valign="top">AntonA</td><td>some of my directories (e.g. c:\winnt and c:\program files) have 2k INDX size while other dirs have 4k.</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>so the dummy key is always the "largest"?</td></tr>
+  <tr><td valign="top">flatcap</td><td>yes</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>i see...</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>so if the non-leaf nodes have data of themselves, wouldn't that make the tree a b-tree?</td></tr>
+  <tr><td valign="top">flatcap</td><td>I've just written a test program to help me understand the trees, which is on bitkeeper</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>I'd love to see that</td></tr>
+  <tr><td valign="top">flatcap</td><td>I read a lots of webpages and I think that the nearest term is a b*tree</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>and how is it different from a b-tree?</td></tr>
+  <tr><td valign="top">flatcap</td><td>a b-tree maintains a minimum of 1/2 full nodes (except for the root node)</td></tr>
+  <tr><td valign="top">flatcap</td><td>a b*tree changes the rules slightly and maintains 2/3 full</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>so it just changes the rules of combining two nodes to one and such?</td></tr>
+  <tr><td valign="top">flatcap</td><td>exactly</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>hmmm...</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>let me think about that for a moment :)</td></tr>
+  <tr><td valign="top">flatcap</td><td>in a true b+tree, the data keys (leaves) should also have pointers to the next (for quick sequential accesses), but that's probably just maintained in memory</td></tr>
+  <tr><td valign="top">flatcap</td><td>I'm going to write up everything I know about ntfs trees soon</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>let me see if i got that...</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>the index root points to the root INDX record</td></tr>
+  <tr><td valign="top">flatcap</td><td>you can see my test prog at:  http://linux-ntfs.bkbits.net:8080/tng-support/src/tree</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>each INDX record contains keys that have pointers to the files themselves and to the keys with lower values</td></tr>
+  <tr><td valign="top">flatcap</td><td>yes</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>I see</td></tr>
+  <tr><td valign="top">flatcap</td><td>the index root lives in the MFT record</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>Yeah, this I managed to discover :)</td></tr>
+  <tr><td valign="top">flatcap</td><td>all the rest (index allocations) are non-res</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>and the number of keys in a single INDX record is completely flexible?</td></tr>
+  <tr><td valign="top">AntonA</td><td>yes</td></tr>
+  <tr><td valign="top">flatcap</td><td>yes, but there's a minimum</td></tr>
+  <tr><td valign="top">AntonA</td><td>a minimum?</td></tr>
+  <tr><td valign="top">flatcap</td><td>yes, that's part of the tree algorithm</td></tr>
+  <tr><td valign="top">AntonA</td><td>surely the minimum is a non-data containing terminator entry?</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>what's the minimum?</td></tr>
+  <tr><td valign="top">flatcap</td><td>the minimum for a b+tree is 1/2 full, b* 2/3 full</td></tr>
+  <tr><td valign="top">flatcap</td><td>only the root node may contain fewer</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>oh.</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>yeah</td></tr>
+  <tr><td valign="top">AntonA</td><td>and the last node...</td></tr>
+  <tr><td valign="top">flatcap</td><td>the keys are moved about to keep this true</td></tr>
+  <tr><td valign="top">flatcap</td><td>even the last node will have the "right number" in it</td></tr>
+  <tr><td valign="top">AntonA</td><td>that would mean that in a really large directory deleting one file could take hours?</td></tr>
+  <tr><td valign="top">flatcap</td><td>no, you might think that, but the balancing doesn't affect many other nodes</td></tr>
+  <tr><td valign="top">flatcap</td><td>if the tree is 4 deep (NTFS equiv say 10^5 files), you'd only be altering 4 index records</td></tr>
+  <tr><td valign="top">flatcap</td><td>I'll draw lots of pictures when I have a moment (probably tomorrow)</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>that should be interesting to read!</td></tr>
+  <tr><td valign="top">flatcap</td><td>are you on our dev mailing list, _Oracle_</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>What mailing list? (er... no.)</td></tr>
+  <tr><td valign="top">AntonA</td><td>the major question that springs to my mind is what would windows ntfs do if it saw an imbalanced tree (because we messed up or because we simply chose to ignore balancing)</td></tr>
+  <tr><td valign="top">flatcap</td><td>hehe, I hate to think :-)</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>I wouldn't want to be there, that's for sure</td></tr>
+  <tr><td valign="top">flatcap</td><td>chkdsk would probably try and rebalance it and you might find that ntfs.sys would just balance it out as files were created/deleted</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>how do i join the list?</td></tr>
+  <tr><td valign="top">flatcap</td><td>http://lists.sourceforge.net/lists/listinfo/linux-ntfs-dev</td></tr>
+  <tr><td valign="top">AntonA</td><td>um, it would be a lot easier to get directory operations working while ignoring the existence of the tree (obviously operating on them correctly so we don't kill the fs)</td></tr>
+  <tr><td valign="top">flatcap</td><td>I'll mail the list and answer questions there</td></tr>
+  <tr><td valign="top">AntonA</td><td>if windows is able to pickup the pieces without complaint / failure, it would be worth considering as a first pass of implementation at least.</td></tr>
+  <tr><td valign="top">flatcap</td><td>yes possibly, but I think I know enough now to build something close enough</td></tr>
+  <tr><td valign="top">flatcap</td><td>(I just wanted a big project where I could start without tripping over you :-)</td></tr>
+  <tr><td valign="top">AntonA</td><td>cool</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>I've got a few more questions if you have the time</td></tr>
+  <tr><td valign="top">AntonA</td><td>As I said before. I am not going anywhere near directories. (-:</td></tr>
+  <tr><td valign="top">flatcap</td><td>sure</td></tr>
+  <tr><td valign="top">_Oracle_</td><td>Smaller ones, though</td></tr>
+  </table>
+  </p>
+
+    <br>
+    <a class="contact" href="../../help/license.html">Copyright (C)</a>
+    <a class="contact" href="http://validator.w3.org/check?uri=http://linux-ntfs.sourceforge.net/ntfs/concepts/index.html">Validate HTML</a>
+    <a class="contact" href="http://jigsaw.w3.org/css-validator/validator?uri=http://linux-ntfs.sourceforge.net/ntfs/concepts/index.html">Validate CSS</a>
+    <img src="http://sourceforge.net/sflogo.php?group_id=13956" width="1" height="1" border="0" alt="SourceForge">
+
+  </body>
+</html>
