@@ -7,8 +7,8 @@
     <link rel="stylesheet" type="text/css" href="../style/ntfsdoc.css" />
     <link rel="icon" href="../style/ntfsicon.png" type="image/png" />
     <link rel="start" type="text/html" href="../index.html" title="NTFS Documentation" />
-    <link rel="next" href="links.html" />
-    <link rel="previous" href="index_header.html" />
+    <link rel="next" href="index_record.html" />
+    <link rel="previous" href="fixup.html" />
     <link rel="contents" href="../index.html" />
     <title>Index Record - Concept - NTFS Documentation</title>
   </head>
@@ -25,36 +25,17 @@
     </table>
 
     <h1>Concept - Index Record</h1>
-    <a class="prevnext" accesskey="," href="index_header.html">Previous</a>
+    <a class="prevnext" accesskey="," href="node_header.html">Previous</a>
     <a class="prevnext" accesskey="." href="links.html">Next</a>
 
     <h2>Overview</h2>
 
-    <pre>This is only applicable to a file index ($I30)</pre>
-
-    <pre>
-    indx help describe as "index = key + data"
-
-    given an INDX record, it's difficult to work out what's
-    being indexed (that info is in the index root)
-    </pre>
-
-    <h2>Definition</h2>
-    <p>
-    This is a sub-node of the B+ tree that implements an index (e.g. a directory). It is
-    stored in the stream of the index allocation attribute associated to the index it
-    belongs to.
+    <p class="check">
+    The size of an Index Record is defined in the
+    <a href="../attributes/index_root.html">Index Root</a> and is 4 kB by default.
     </p>
 
     <h2>Layout</h2>
-    <p>
-    An INDX buffer is at least 2 KB large or the cluster size if larger (this seems to be
-    a per-index parameter). It falls into 2 parts:
-    </p>
-
-    <h3>The header part</h3>
-
-    this ISN'T just the header...
 
     <table border="1" summary="" cellspacing="0">
       <tr>
@@ -63,143 +44,62 @@
         <th>Description</th>
       </tr>
       <tr>
-        <td class="numeric">~</td>
-        <td class="numeric">~</td>
-        <td><a href="../concepts/index_header.html">Standard Index Header</a></td>
+        <td class="numeric">0</td>
+        <td class="numeric">4</td>
+        <td>Magic number 'INDX'</td>
       </tr>
       <tr>
-        <td class="numeric">0x00</td>
+        <td class="numeric">4</td>
+        <td class="numeric">2</td>
+        <td>Offset to the <a href="fixup.html">Update Sequence</a></td>
+      </tr>
+      <tr>
+        <td class="numeric">6</td>
+        <td class="numeric">2</td>
+        <td>Size in words of the Update Sequence (S)</td>
+      </tr>
+      <tr>
         <td class="numeric">8</td>
-        <td>MFT Reference of the file</td>
-      </tr>
-      <tr>
-        <td class="numeric">0x08</td>
-        <td class="numeric">2</td>
-        <td>Size of this index entry</td>
-      </tr>
-      <tr>
-        <td class="numeric">0x0A</td>
-        <td class="numeric">2</td>
-        <td>Offset to the filename</td>
-      </tr>
-      <tr>
-        <td class="numeric">0x0C</td>
-        <td class="numeric">2</td>
-        <td>Index Flags</td>
-      </tr>
-      <tr>
-        <td class="numeric">0x0E</td>
-        <td class="numeric">2</td>
-        <td>Padding (align to 8 bytes)</td>
-      </tr>
-      <tr>
-        <td class="numeric">0x10</td>
         <td class="numeric">8</td>
-        <td>MFT File Reference of the parent</td>
+        <td>$LogFile sequence number</td>
+      </tr>
+      <tr>
+        <td class="numeric">16</td>
+        <td class="numeric">8</td>
+        <td><a href="clusters.html">VCN</a> of this Index record in the
+        <a href="../attributes/index_allocation.html">Index Allocation</a></td>
       </tr>
       <tr>
         <td class="numeric">0x18</td>
-        <td class="numeric">8</td>
-        <td>File creation time</td>
-      </tr>
-      <tr>
-        <td class="numeric">0x20</td>
-        <td class="numeric">8</td>
-        <td>Last modification time</td>
+        <td class="numeric">16</td>
+        <td><a href="node_header.html">Index Node Header</a></td>
       </tr>
       <tr>
         <td class="numeric">0x28</td>
-        <td class="numeric">8</td>
-        <td>Last modification time for FILE record</td>
+        <td class="numeric">2</td>
+        <td>Update sequence</td>
       </tr>
       <tr>
-        <td class="numeric">0x30</td>
-        <td class="numeric">8</td>
-        <td>Last access time</td>
+        <td class="numeric">0x2A</td>
+        <td class="numeric">2S-2</td>
+        <td>Update sequence array</td>
       </tr>
       <tr>
-        <td class="numeric">0x38</td>
-        <td class="numeric">8</td>
-        <td>Allocated size of file</td>
+        <td class="numeric">X</td>
+        <td class="numeric">Y</td>
+        <td><a href="index_entry.html">Index Entry</a></td>
       </tr>
       <tr>
-        <td class="numeric">0x40</td>
-        <td class="numeric">8</td>
-        <td>Real size of file</td>
+        <td class="numeric">X+Y</td>
+        <td class="numeric">Z</td>
+        <td>Next Index Entry</td>
       </tr>
       <tr>
-        <td class="numeric">0x48</td>
-        <td class="numeric">8</td>
-        <td>File Flags</td>
-      </tr>
-      <tr>
-        <td class="numeric">0x50</td>
-        <td class="numeric">1</td>
-        <td>Length of filename (F)</td>
-      </tr>
-      <tr>
-        <td class="numeric">0x51</td>
-        <td class="numeric">1</td>
-        <td><a href="filename_namespace.html">Filename namespace</a></td>
-      </tr>
-      <tr>
-        <td class="numeric">0x52</td>
-        <td class="numeric">2F</td>
-        <td>Filename</td>
-      </tr>
-      <tr>
-        <td class="numeric">2F+0x52</td>
-        <td class="numeric">P</td>
-        <td>Padding (align to 8 bytes)</td>
-      </tr>
-      <tr>
-        <td class="numeric">P+2F+0x52</td>
-        <td class="numeric">8</td>
-        <td>VCN of index buffer with sub-nodes</td>
+        <td class="numeric">~</td>
+        <td class="numeric">~</td>
+        <td>...</td>
       </tr>
     </table>
-
-    <pre>
-    N.B. the filename is not null terminated
-    surely the flags can't be 8 bytes long
-    table for the flags
-    VCN of ib only exists when flags&amp;1
-    last entry has a size of 0x10 (just large enough
-    for the flags (and a mft ref of zero))
-    </pre>
-
-    <h3>The sequence of index entries part</h3>
-    <p>
-    This is a sequence of index entries similar to the one found in the index root
-    attribute.
-    </p>
-
-    The index entry has the following structure:
-
-    <pre>
-    Index entry flags (16-bit).
-
-    INDEX_ENTRY_NODE = cpu_to_le16(1), This entry contains a sub-node,
-                      i.e. a reference to an index
-                      block in form of a virtual
-                      cluster number (see below).
-    INDEX_ENTRY_END  = cpu_to_le16(2), This signifies the last entry in
-                      an index block. The index entry
-                      does not represent a file but it
-                      can point to a sub-node.
-
-    This is an index entry. A sequence of such entries follows each INDEX_HEADER
-    structure. Together they make up a complete index. The index follows either
-    an index root attribute or an index allocation attribute.
-
-    NOTE: Before NTFS 3.0 only filename attributes were indexed.
-    </pre>
-
-    <p>
-    Most entries are not valid (and present) if the entry is the last one. This entry
-    does not represent a file and is used only for subnodes. The pointer to the subnode
-    buffer is only present if the entry has subnodes.
-    </p>
 
     <br />
     <a class="contact" href="../help/license.html">Copyright &copy;</a>

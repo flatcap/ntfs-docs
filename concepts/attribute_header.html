@@ -217,14 +217,13 @@
         <td class="numeric">2N+0x18</td>
         <td class="numeric">L</td>
         <td class="numeric">&nbsp;</td>
-        <td>The Attribute (c)</td>
+        <td>The Attribute (b)</td>
       </tr>
     </table>
 
     <p>
-    (a) Resident attributes cannot be compressed<br />
-    (b) Each attribute has a unique identifier<br />
-    (c) Rounded up to a multiple of 4 bytes
+    (a) Each attribute has a unique identifier<br />
+    (b) Rounded up to a multiple of 4 bytes
     </p>
 
     <h3>Non-Resident, No Name</h3>
@@ -330,7 +329,7 @@
         <td class="numeric">0x40</td>
         <td class="numeric">...</td>
         <td class="numeric">&nbsp;</td>
-        <td>Data Runs</td>
+        <td><a href="data_runs.html">Data Runs</a></td>
       </tr>
     </table>
 
@@ -338,7 +337,7 @@
     (a) Each attribute has a unique identifier<br />
     (b) Compression unit size = 2<sup>x</sup> clusters. 0 implies uncompressed<br />
     (c) This is the attribute size rounded up to the cluster size<br />
-    (d) When is this not equal to the allocated size?
+    (d) Compressed data size.
     </p>
 
     <h3>Non-Resident, Named</h3>
@@ -450,7 +449,7 @@
         <td class="numeric">2N+0x40</td>
         <td class="numeric">...</td>
         <td class="numeric">&nbsp;</td>
-        <td>Data Runs (b)</td>
+        <td><a href="data_runs.html">Data Runs</a> (b)</td>
       </tr>
     </table>
 
@@ -459,7 +458,7 @@
     (b) Rounded up to a multiple of 4 bytes<br />
     (c) Compression unit size = 2<sup>x</sup> clusters. 0 implies uncompressed<br />
     (d) This is the attribute size rounded up to the cluster size<br />
-    (e) When is this not equal to the allocated size?
+    (e) Compressed data size.
     </p>
 
     <h2>Flags</h2>

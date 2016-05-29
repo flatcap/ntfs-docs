@@ -7,10 +7,10 @@
     <link rel="stylesheet" type="text/css" href="../style/ntfsdoc.css" />
     <link rel="icon" href="../style/ntfsicon.png" type="image/png" />
     <link rel="start" type="text/html" href="../index.html" title="NTFS Documentation" />
-    <link rel="next" href="index.html" />
-    <link rel="previous" href="sid.html" />
+    <link rel="next" href="index_allocation.html" />
+    <link rel="previous" href="data.html" />
     <link rel="contents" href="../index.html" />
-    <title>Sparse - Concept - NTFS Documentation</title>
+    <title>Index Node Header - Concept - NTFS Documentation</title>
   </head>
 
   <body>
@@ -24,22 +24,42 @@
       </tr>
     </table>
 
-    <h1>Concept - Sparse</h1>
-    <a class="prevnext" accesskey="," href="sid.html">Previous</a>
-    <a class="prevnext" accesskey="." href="index.html">Next</a>
+    <h1>Concept - Index Node Header</h1>
+    <a class="prevnext" accesskey="," href="index_entry.html">Previous</a>
+    <a class="prevnext" accesskey="." href="index_record.html">Next</a>
 
-    <h2>Overview</h2>
-
-    <p>
-    Sparse files
-    </p>
-
-    <pre>
-    fix the data runs page for NT4 (old style)
-    13 b8 ae 04 ff 00     old
-    03 b8 ae 04 00        new
-    bad clus on NT4 sparse data runs use -1!
-    </pre>
+    <table border="1" summary="" cellspacing="0">
+      <tr>
+        <th class="numeric">Offset</th>
+        <th class="numeric">Size</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td class="numeric">0</td>
+        <td class="numeric">4</td>
+        <td>Offset to first Index Entry</td>
+      </tr>
+      <tr>
+        <td class="numeric">4</td>
+        <td class="numeric">4</td>
+        <td>Total size of the Index Entries</td>
+      </tr>
+      <tr>
+        <td class="numeric">8</td>
+        <td class="numeric">4</td>
+        <td>Allocated size of the Node</td>
+      </tr>
+      <tr>
+        <td class="numeric">12</td>
+        <td class="numeric">1</td>
+        <td>Non-leaf node Flag (has sub-nodes)</td>
+      </tr>
+      <tr>
+        <td class="numeric">13</td>
+        <td class="numeric">3</td>
+        <td>Padding (align to 8 bytes)</td>
+      </tr>
+    </table>
 
     <br />
     <a class="contact" href="../help/license.html">Copyright &copy;</a>

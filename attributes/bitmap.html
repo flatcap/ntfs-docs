@@ -42,18 +42,17 @@
     <h2>Layout of the Attribute</h2>
 
     <p>
-    This attribute is currently used in two places: indexes (e.g. directories), $MFT.
-    N.B. The index entries and the FILE records also have flags in them to show
-    if they are in use or not.
+    This attribute is currently used in two places: indexes (e.g. directories) and $MFT.
+    <br/>
+    N.B. The File Records also have flags in them to show if they are in use or not.</p>
+
+    <p>
+    In an index, the bit field shows which index nodes are in use.
+    Each bit represents one Index Record of the Index Allocation.
     </p>
 
     <p>
-    In an index, the bit field shows which index entries are in use.
-    Each bit represents one VCN of the index allocation.
-    </p>
-
-    <p>
-    In the $MFT, the bit field shows which FILE records are in use.
+    In the $MFT, the bit field shows which File Records are in use.
     </p>
 
     <table border="1" summary="" cellspacing="0">
@@ -68,8 +67,8 @@
         <td><a href="../concepts/attribute_header.html">Standard Attribute Header</a></td>
       </tr>
       <tr>
-        <td class="numeric">0x00</td>
-        <td class="numeric">&nbsp;</td>
+        <td class="numeric">~</td>
+        <td class="numeric">~</td>
         <td>Bit field</td>
       </tr>
     </table>

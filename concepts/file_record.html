@@ -47,21 +47,16 @@
 
     <p>
     See also:
+    <a href="../files/mft.html">$MFT</a>,
+    <a href="fixup.html">Record fixup</a>,
     <a href="../attributes/index.html">Attributes</a>,
     <a href="attribute_header.html">Standard Attribute Header</a>,
-    <a href="../files/mft.html">$MFT</a>,
-    <a href="../files/boot.html">$Boot</a>,
-    <a href="file.html">File</a>,
-    <a href="fixup.html">Fixup</a>,
-    <a href="attribute_id.html">Attribute Id</a>,
-    <a href="directory.html">Directory</a>,
     </p>
 
     <h2>Layout</h2>
 
     <dl>
-      <dt>FILE Record</dt>
-      <dd>Header</dd>
+      <dd>Record Header</dd>
       <dd>Attribute</dd>
       <dd>Attribute</dd>
       <dd>...</dd>
@@ -85,13 +80,13 @@
         <td class="numeric">0x04</td>
         <td class="numeric">2</td>
         <td>&nbsp;</td>
-        <td>Offset to the update sequence</td>
+        <td>Offset to the <a href="fixup.html">Update Sequence</a></td>
       </tr>
       <tr>
         <td class="numeric">0x06</td>
         <td class="numeric">2</td>
         <td>&nbsp;</td>
-        <td>Size in words of Update Sequence Number &amp; Array (S)</td>
+        <td>Size in words of Update Sequence (S)</td>
       </tr>
       <tr>
         <td class="numeric">0x08</td>
@@ -139,7 +134,7 @@
         <td class="numeric">0x20</td>
         <td class="numeric">8</td>
         <td>&nbsp;</td>
-        <td>File reference to the base FILE record</td>
+        <td><a href="file_reference.html">File reference</a> to the base FILE record</td>
       </tr>
       <tr>
         <td class="numeric">0x28</td>

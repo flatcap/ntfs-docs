@@ -7,10 +7,10 @@
     <link rel="stylesheet" type="text/css" href="../style/ntfsdoc.css" />
     <link rel="icon" href="../style/ntfsicon.png" type="image/png" />
     <link rel="start" type="text/html" href="../index.html" title="NTFS Documentation" />
-    <link rel="next" href="index_record.html" />
-    <link rel="previous" href="fixup.html" />
+    <link rel="next" href="bitmap.html" />
+    <link rel="previous" href="index_root.html" />
     <link rel="contents" href="../index.html" />
-    <title>Index Header - Concept - NTFS Documentation</title>
+    <title>Index Entry - Concept - NTFS Documentation</title>
   </head>
 
   <body>
@@ -24,27 +24,9 @@
       </tr>
     </table>
 
-    <h1>Concept - Index Header</h1>
-    <a class="prevnext" accesskey="," href="fixup.html">Previous</a>
-    <a class="prevnext" accesskey="." href="index_record.html">Next</a>
-
-    <h2>Overview</h2>
-
-    <p>
-    Every Index Record has a standard header and a set of blocks
-    containing an Index Key and Index Data.
-    </p>
-
-    <p class="check">
-    The size of an Index Record is defined in
-    <a href="../files/boot.html">$Boot</a> and always seems to be 4KB.
-    <!-- comment about size being a per-index parameter -->
-    <!-- comment about size being max (2KB, Cluster Size) -->
-    </p>
-
-    <h2>Layout</h2>
-
-    <h3>Standard Index Header</h3>
+    <h1>Concept - Index Entry</h1>
+    <a class="prevnext" accesskey="," href="filename_namespace.html">Previous</a>
+    <a class="prevnext" accesskey="." href="node_header.html">Next</a>
 
     <table border="1" summary="" cellspacing="0">
       <tr>
@@ -53,71 +35,75 @@
         <th>Description</th>
       </tr>
       <tr>
-        <td class="numeric">0x00</td>
-        <td class="numeric">4</td>
-        <td>Magic number 'INDX'</td>
-      </tr>
-      <tr>
-        <td class="numeric">0x04</td>
-        <td class="numeric">2</td>
-        <td>Offset to the Update Sequence</td>
-      </tr>
-      <tr>
-        <td class="numeric">0x06</td>
-        <td class="numeric">2</td>
-        <td>Size in words of the Update Sequence Number &amp; Array (S)</td>
-      </tr>
-      <tr>
-        <td class="numeric">0x08</td>
+        <td class="numeric">0</td>
         <td class="numeric">8</td>
-        <td>$LogFile sequence number</td>
+        <td><a href="file_reference.html">File reference</a></td>
       </tr>
       <tr>
-        <td class="numeric">0x10</td>
         <td class="numeric">8</td>
-        <td>VCN of this INDX buffer in the Index Allocation</td>
+        <td class="numeric">2</td>
+        <td>Length of the index entry (L)</td>
       </tr>
       <tr>
-        <td class="numeric">0x18</td>
-        <td class="numeric">4</td>
-        <td>Offset to the Index Entries (a)</td>
+        <td class="numeric">10</td>
+        <td class="numeric">2</td>
+        <td>Length of the stream (S)</td>
       </tr>
       <tr>
-        <td class="numeric">0x1C</td>
-        <td class="numeric">4</td>
-        <td>Size of Index Entries (a)</td>
-      </tr>
-      <tr>
-        <td class="numeric">0x20</td>
-        <td class="numeric">4</td>
-        <td>Allocated size of the Index Entries (a)</td>
-      </tr>
-      <tr>
-        <td class="numeric">0x24</td>
+        <td class="numeric">12</td>
         <td class="numeric">1</td>
-        <td>1 if not leaf node (b)</td>
+        <td>Flags</td>
       </tr>
       <tr>
-        <td class="numeric">0x25</td>
-        <td class="numeric">3</td>
-        <td>Padding (always zero)</td>
+        <td colspan="3">The next field is only present when the last entry flag is not
+        set</td>
       </tr>
       <tr>
-        <td class="numeric">0x28</td>
-        <td class="numeric">2</td>
-        <td>Update sequence</td>
+        <td class="numeric">16</td>
+        <td class="numeric">S</td>
+        <td>Stream</td>
       </tr>
       <tr>
-        <td class="numeric">0x2A</td>
-        <td class="numeric">2S-2</td>
-        <td>Update sequence array</td>
+        <td class="numeric">16+S</td>
+        <td class="numeric">?</td>
+        <td>Align 8</td>
+      </tr>
+      <tr>
+        <td colspan="3">The next field is only present when the sub-node flag is set</td>
+      </tr>
+      <tr>
+        <td class="numeric">L-8</td>
+        <td class="numeric">8</td>
+        <td><a href="clusters.html">VCN</a> of the sub-node in the
+        <a href="../attributes/index_allocation.html">Index Allocation</a></td>
       </tr>
     </table>
 
-    <pre>(a) These values are relative to 0x18</pre>
-    <pre>(b) Has children</pre>
-
     <h2>Notes</h2>
+    <h3>Flags</h3>
+
+    <table border="1" summary="" cellspacing="0">
+      <tr>
+        <th class="numeric">Flag</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td class="numeric">1</td>
+        <td>Index entry points to a sub-node</td>
+      </tr>
+      <tr>
+        <td class="numeric">2</td>
+        <td>Last index entry in the node</td>
+      </tr>
+    </table>
+
+    <p>The last entry flag is used to indicate the end of a sequence of index
+    entries. Although it does not represent a valid file, it can point to a
+    sub-node.</p>
+
+    <h3>Stream</h3>
+
+    <p>A copy of the body (without header) of the attribute, indexed by the index entry.</p>
 
     <h3>List of Common Indexes</h3>
 
@@ -125,12 +111,12 @@
       <tr>
         <th>Name</th>
         <th>Index Of</th>
-        <th>Description</th>
+        <th>Used By</th>
       </tr>
       <tr>
         <td><a href="../help/glossary.html#i30">$I30</a></td>
         <td><a href="../attributes/file_name.html">Filenames</a></td>
-        <td><a href="directory.html">Used by Directories</a></td>
+        <td><a href="../concepts/directory.html">Directories</a></td>
       </tr>
       <tr>
         <td><a href="../help/glossary.html#sdh">$SDH</a></td>
@@ -163,14 +149,6 @@
         <td><a href="../files/reparse.html">$Reparse</a></td>
       </tr>
     </table>
-
-    <h3>Other Information</h3>
-
-    <p>
-    There is no information contained in the Index Record
-    describing what the index is storing (this is kept in
-    the Index Root).
-    </p>
 
     <br />
     <a class="contact" href="../help/license.html">Copyright &copy;</a>
