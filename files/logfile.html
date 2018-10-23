@@ -29,6 +29,11 @@
     <a class="prevnext" accesskey="." href="volume.html">Next</a>
 
     <h2>Overview</h2>
+    <p>
+    <b>
+    Author's note: The information presented here is intended to complement the information presented in the "NTFS Recovery Support" subchapter in Windows Internals, by Mark E. Russinovich and David Solomon.
+    </b>
+    </p>
 
     <h2><a class="heading" href="../attributes/index.html">Attributes</a></h2>
 
@@ -59,269 +64,1314 @@
     <h3>Unnamed Data Stream</h3>
 
     <p>
-    Little is known about the LogFile's structure.
+    At the beginning of the log files are two LFS_RESTART_PAGE pages, 4KB each,    the second is a backup in case the first becomes corrupt, and the two will be identical if the volume is cleanly dismounted.
+    The rest of the log file comprised of a series of LFS_RECORD_PAGE pages, the size of each page is specified in the LFS_RESTART_AREA structure.
+    <br/>
+    As of LFS v1.1 (The latest version as of this writing, being used from Windows NT 4.0 onwards), the first two pages have special purpose and are called tail pages, the rest of the pages are sometimes called regular pages.
+    The tail pages are used for backup purposes, and in some circumstances may contain information that haven't yet been written to the regular log area.
     </p>
 
-    <!--
+    <h4>LFS_RESTART_PAGE</h4>
     <table border="1" summary="" cellspacing="0">
       <tr>
-        <th></th>
+        <th>Offset</th>
+        <th>Size</th>
+        <th>Name</th>
+        <th>Description</th>
       </tr>
       <tr>
+        <td>0x00</td>
+        <td>8</td>
+        <td>MULTI_SECTOR_HEADER</td>
+        <td>Signature: 'RSTR'</td>
+      </tr>
+      <tr>
+        <td>0x08</td>
+        <td>8</td>
+        <td>ChkDskLsn</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x10</td>
+        <td>4</td>
+        <td>SystemPageSize</td>
+        <td>The size of each LFS_RESTART_PAGE</td>
+      </tr>
+      <tr>
+        <td>0x14</td>
+        <td>4</td>
+        <td>LogPageSize</td>
+        <td>The size of each LFS_RECORD_PAGE</td>
+      </tr>
+      <tr>
+        <td>0x18</td>
+        <td>2</td>
+        <td>RestartOffset</td>
+        <td>The offset of the LFS_RESTART_AREA relative to the start of this structure</td>
+      </tr>
+      <tr>
+        <td>0x1A</td>
+        <td>2</td>
+        <td>MinorVersion</td>
+        <td>Signed integer, LFS minor version number</td>
+      </tr>
+      <tr>
+        <td>0x1C</td>
+        <td>2</td>
+        <td>MajorVersion</td>
+        <td>Signed integer, LFS major version number</td>
+      </tr>
+      <tr>
+        <td>0x1E</td>
+        <td>Variable</td>
+        <td>UpdateSequenceArray</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>RestartOffset</td>
+        <td>Variable</td>
+        <td>LFS_RESTART_AREA</td>
         <td></td>
       </tr>
     </table>
-    -->
 
-    <h2>Notes</h2>
+    <h4>LFS_RESTART_AREA</h4>
+    <table border="1" summary="" cellspacing="0">
+      <tr>
+        <th>Offset</th>
+        <th>Size</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>0x00</td>
+        <td>8</td>
+        <td>CurrentLsn</td>
+        <td>The LSN of the latest record at the time this structure was written</td>
+      </tr>
+      <tr>
+        <td>0x08</td>
+        <td>2</td>
+        <td>LogClients</td>
+        <td>Number of LFS_CLIENT_RECORD entries</td>
+      </tr>
+      <tr>
+        <td>0x0A</td>
+        <td>2</td>
+        <td>ClientFreeList</td>
+        <td> The index of the first free log client record in the array</td>
+      </tr>
+      <tr>
+        <td>0x0C</td>
+        <td>2</td>
+        <td>ClientInUseList</td>
+        <td>The index of the first in-use log client record in the array</td>
+      </tr>
+      <tr>
+        <td>0x0E</td>
+        <td>2</td>
+        <td>Flags</td>
+        <td>SinglePageIO = 0x0001, CleanDismount = 0x0002</td>
+      </tr>
+      <tr>
+        <td>0x10</td>
+        <td>4</td>
+        <td>SeqNumberBits</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x14</td>
+        <td>2</td>
+        <td>RestartAreaLength</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x16</td>
+        <td>2</td>
+        <td>ClientArrayOffset</td>
+        <td>The offset of the first LFS_CLIENT_RECORD relative to the start of this structure</td>
+      </tr>
+      <tr>
+        <td>0x18</td>
+        <td>8</td>
+        <td>FileSize</td>
+        <td>The size of the log file</td>
+      </tr>
+      <tr>
+        <td>0x20</td>
+        <td>4</td>
+        <td>LastLsnDataLength</td>
+        <td>The length of data belongs to the record associated with CurrentLsn (not including the LFS_RECORD_HEADER)</td>
+      </tr>
+      <tr>
+        <td>0x24</td>
+        <td>2</td>
+        <td>RecordHeaderLength</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x26</td>
+        <td>2</td>
+        <td>LogPageDataOffset</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x28</td>
+        <td>4</td>
+        <td>RevisionNumber</td>
+        <td>This value is incremented by 1 every time the LogRestartArea is being written (initial value is chosen at random)</td>
+      </tr>
+      <tr>
+        <td>ClientArrayOffset</td>
+        <td>Variable</td>
+        <td>LFS_CLIENT_RECORD array</td>
+        <td>Array of clients who are using this log file (currently the only client is NTFS itself)</td>
+      </tr>
+    </table>
 
-    <h3>Other Information</h3>
+    <h4>LFS_CLIENT_RECORD</h4>
+    <table border="1" summary="" cellspacing="0">
+      <tr>
+        <th>Offset</th>
+        <th>Size</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>0x00</td>
+        <td>8</td>
+        <td>OldestLsn</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x08</td>
+        <td>8</td>
+        <td>ClientRestartLsn</td>
+        <td>The LSN of the latest restart record at the time this structure was written</td>
+      </tr>
+      <tr>
+        <td>0x10</td>
+        <td>2</td>
+        <td>PrevClient</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x14</td>
+        <td>4</td>
+        <td>NextClient</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x16</td>
+        <td>6</td>
+        <td>Padding</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x1C</td>
+        <td>4</td>
+        <td>ClientNameLength</td>
+        <td>Number of bytes</td>
+      </tr>
+      <tr>
+        <td>0x20</td>
+        <td>Variable</td>
+        <td>ClientName</td>
+        <td></td>
+      </tr>
+    </table>
+
+    <h4>LFS_RECORD_PAGE</h4>
+    <table border="1" summary="" cellspacing="0">
+      <tr>
+        <th>Offset</th>
+        <th>Size</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>0x00</td>
+        <td>8</td>
+        <td>MULTI_SECTOR_HEADER</td>
+        <td>Signature: 'RCRD'</td>
+      </tr>
+      <tr>
+        <td>0x08</td>
+        <td>8</td>
+        <td>LastLsnOrFileOffset</td>
+        <td>Last LSN that starts on this page for regular log pages, FileOffset for tail copies (indicates the location in the file where the page should be placed)</td>
+      </tr>
+      <tr>
+        <td>0x10</td>
+        <td>4</td>
+        <td>Flags</td>
+        <td>RecordEnd = 0x00000001 (Indicates that a log record ends on this page)</td>
+      </tr>
+      <tr>
+        <td>0x14</td>
+        <td>2</td>
+        <td>PageCount</td>
+        <td>Number of pages written as part of the IO transfer. a MultiPage record is likely to be written as part of two separate IO transfers (since the last page may have room for more records that will be written in a later transfer)</td>
+      </tr>
+      <tr>
+        <td>0x16</td>
+        <td>2</td>
+        <td>PagePosition</td>
+        <td>One-based</td>
+      </tr>
+      <tr>
+        <td>0x18</td>
+        <td>2</td>
+        <td>NextRecordOffset</td>
+        <td>The offset of the free space in the page, if the last record has MultiPage flag set this value is not incremented and will point to the start of the record.</td>
+      </tr>
+      <tr>
+        <td>0x1A</td>
+        <td>6</td>
+        <td>Padding</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x20</td>
+        <td>8</td>
+        <td>LastEndLsn</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x28</td>
+        <td>Variable</td>
+        <td>UpdateSequenceArray</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>Variable</td>
+        <td>Data</td>
+        <td></td>
+      </tr>
+    </table>
+
+    <h4>LFS_RECORD</h4>
+    <table border="1" summary="" cellspacing="0">
+      <tr>
+        <th>Offset</th>
+        <th>Size</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>0x00</td>
+        <td>8</td>
+        <td>ThisLsn</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x08</td>
+        <td>8</td>
+        <td>ClientPreviousLsn</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x10</td>
+        <td>8</td>
+        <td>ClientUndoNextLsn</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x18</td>
+        <td>4</td>
+        <td>ClientDataLength</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x1C</td>
+        <td>2</td>
+        <td>ClientSeqNumber</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x1E</td>
+        <td>2</td>
+        <td>ClientIndex</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x20</td>
+        <td>4</td>
+        <td>RecordType</td>
+        <td>ClientRecord = 1, ClientRestart = 2</td>
+      </tr>
+      <tr>
+        <td>0x24</td>
+        <td>4</td>
+        <td>TransactionId</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x28</td>
+        <td>2</td>
+        <td>Flags</td>
+        <td>MultiPage = 0x0001</td>
+      </tr>
+      <tr>
+        <td>0x2A</td>
+        <td>6</td>
+        <td>Padding</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x30</td>
+        <td>ClientDataLength</td>
+        <td>Data</td>
+        <td></td>
+      </tr>
+    </table>
+
+    <h3>Structures specific to the NTFS client</h3>
+    <h4>RESTART_AREA</h4>
+    <table border="1" summary="" cellspacing="0">
+      <tr>
+        <th>Offset</th>
+        <th>Size</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>0x00</td>
+        <td>4</td>
+        <td>MajorVersion</td>
+        <td>NTFS log client major version</td>
+      </tr>
+      <tr>
+        <td>0x04</td>
+        <td>4</td>
+        <td>MinorVersion</td>
+        <td>NTFS log client minor version</td>
+      </tr>
+      <tr>
+        <td>0x08</td>
+        <td>8</td>
+        <td>StartOfCheckpointLsn</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x10</td>
+        <td>8</td>
+        <td>OpenAttributeTableLsn</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x18</td>
+        <td>8</td>
+        <td>AttributeNamesLsn</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x20</td>
+        <td>8</td>
+        <td>DirtyPageTableLsn</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x28</td>
+        <td>8</td>
+        <td>TransactionTableLsn</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x30</td>
+        <td>4</td>
+        <td>OpenAttributeTableLength</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x34</td>
+        <td>4</td>
+        <td>AttributeNamesLength</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x38</td>
+        <td>4</td>
+        <td>DirtyPageTableLength</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x3C</td>
+        <td>4</td>
+        <td>TransactionTableLength</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x40</td>
+        <td>8</td>
+        <td>Unknown1</td>
+        <td>$USN Journal related length</td>
+      </tr>
+      <tr>
+        <td>0x48</td>
+        <td>8</td>
+        <td>PreviousRestartRecordLsn</td>
+        <td>The value of CurrentLsn on previous mount?</td>
+      </tr>
+      <tr>
+        <td>0x50</td>
+        <td>4</td>
+        <td>BytesPerCluster</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x54</td>
+        <td>4</td>
+        <td>Padding</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x58</td>
+        <td>8</td>
+        <td>UsnJournal</td>
+        <td>MFT_SEGMENT_REFERENCE of the $USN journal</td>
+      </tr>
+      <tr>
+        <td>0x60</td>
+        <td>8</td>
+        <td>Unknown2</td>
+        <td>$USN Journal related</td>
+      </tr>
+      <tr>
+        <td>0x68</td>
+        <td>8</td>
+        <td>UnknownLsn</td>
+        <td>This field is present starting in Windows Vista and later</td>
+      </tr>
+    </table>
 
     <p>
-    The logging area consists of a sequence of 4KB log records. Each
-    logrecord is structured as follows:
+        <div>Windows NT 4.0 writes RESTART_AREA records that are 64 bytes long.</div>
+        <div>Windows 2000 / XP / 2003 write RESTART_AREA records that are 104 bytes long.</div>
+        <div>Windows Vista / 7 / 8 / 10 write RESTART_AREA records that are 112 bytes long.</div>
     </p>
-
-    <pre>
-    offset(length)   contents
-    0(4)             Magic number 'RCRD'
-    1E(12)           Fixup
-    </pre>
-
     <p>
-    The logrecord supposedly contains a sequence of variable sized records. The
-    structuring of those is not clear. File 2 is $LogFile, which contains transaction
-    records to guarantee data integrity in case of a system failure. As pp. 37 describe,
-    it consists of 2 copies of the restart area, and the 'infinite' logging area.
+        When x64 versions of Windows format the volume they set the RESTART_AREA version to 1.0 (x86 will set the version to 0.0).
+        The record version will be maintained when moving disks between operating systems using the same record length.
     </p>
 
-    <p>When you want to write a file on a storage unit, you have to update the file
-    itself plus some tables of the filesystem (say as an example the date of the file).
-    At this point, you need a transaction made of 2 operations (update the file itself,
-    update the date of the file).</p>
+    <h4>NTFS_LOG_RECORD</h4>
+    <table border="1" summary="" cellspacing="0">
+      <tr>
+        <th>Offset</th>
+        <th>Size</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>0x00</td>
+        <td>2</td>
+        <td>RedoOperation</td>
+        <td>NTFS_LOG_OPERATION</td>
+      </tr>
+      <tr>
+        <td>0x02</td>
+        <td>2</td>
+        <td>UndoOperation</td>
+        <td>NTFS_LOG_OPERATION</td>
+      </tr>
+      <tr>
+        <td>0x04</td>
+        <td>2</td>
+        <td>RedoOffset</td>
+        <td>Offset MUST be aligned to 8 byte boundary</td>
+      </tr>
+      <tr>
+        <td>0x06</td>
+        <td>2</td>
+        <td>RedoLength</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x08</td>
+        <td>2</td>
+        <td>UndoOffset</td>
+        <td>Offset MUST be aligned to 8 byte boundary</td>
+      </tr>
+      <tr>
+        <td>0x0A</td>
+        <td>2</td>
+        <td>UndoLength</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x0C</td>
+        <td>2</td>
+        <td>TargetAttributeOffset</td>
+        <td>Offset of the attribute in the open attribute table, 0 is a valid value for for operations that do not require TargetAttribute</td>
+      </tr>
+      <tr>
+        <td>0x0E</td>
+        <td>2</td>
+        <td>LCNsToFollow</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x10</td>
+        <td>2</td>
+        <td>RecordOffset</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x12</td>
+        <td>2</td>
+        <td>AttributeOffset</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x14</td>
+        <td>2</td>
+        <td>ClusterBlockOffset</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x16</td>
+        <td>2</td>
+        <td>Reserved</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x18</td>
+        <td>8</td>
+        <td>TargetVCN</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x20</td>
+        <td>Variable</td>
+        <td>LCNsForPage</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>RedoOffset</td>
+        <td>RedoLength</td>
+        <td>RedoData</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>UndoOffset</td>
+        <td>UndoLength</td>
+        <td>UndoData</td>
+        <td></td>
+      </tr>
+    </table>
+    <p>
+        The NTFS_LOG_RECORD_HEADER structure definition reserves 8 bytes for the first LCN. UndoOffset / UndoOffset MUST be greater than or equal to 0x28.
+    </p>
 
-    <p>If the transaction is realized, you are sure that your file is written on the
-    storage unit, and that the filesystem has been left in a defined state.</p>
+    <h4>NTFS_LOG_OPERATION</h4>
+    <table border="1" summary="" cellspacing="0">
+      <tr>
+        <th>Value</th>
+        <th>Name</th>
+        <th>Data</th>
+      </tr>
+      <tr>
+        <td>0x00</td>
+        <td>Noop</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x01</td>
+        <td>CompensationLogRecord</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x02</td>
+        <td>InitializeFileRecordSegment</td>
+        <td>FILE_RECORD_SEGMENT</td>
+      </tr>
+      <tr>
+        <td>0x03</td>
+        <td>DeallocateFileRecordSegment</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x04</td>
+        <td>WriteEndOfFileRecordSegment</td>
+        <td>ATTRIBUTE_RECORD_HEADER</td>
+      </tr>
+      <tr>
+        <td>0x05</td>
+        <td>CreateAttribute</td>
+        <td>ATTRIBUTE_RECORD_HEADER</td>
+      </tr>
+      <tr>
+        <td>0x06</td>
+        <td>DeleteAttribute</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x07</td>
+        <td>UpdateResidentAttributeValue</td>
+        <td>(Attribute Value)</td>
+      </tr>
+      <tr>
+        <td>0x08</td>
+        <td>UpdateNonResidentAttributeValue</td>
+        <td>(Attribute Value)</td>
+      </tr>
+      <tr>
+        <td>0x09</td>
+        <td>UpdateMappingPairs</td>
+        <td>(Mapping Pair bytes)</td>
+      </tr>
+      <tr>
+        <td>0x0A</td>
+        <td>DeleteDirtyClusters</td>
+        <td>array of LCN_RANGE</td>
+      </tr>
+      <tr>
+        <td>0x0B</td>
+        <td>SetNewAttributeSizes</td>
+        <td>NEW_ATTRIBUTE_SIZES</td>
+      </tr>
+      <tr>
+        <td>0x0C</td>
+        <td>AddIndexEntryToRoot</td>
+        <td>INDEX_ENTRY</td>
+      </tr>
+      <tr>
+        <td>0x0D</td>
+        <td>DeleteIndexEntryFromRoot</td>
+        <td>INDEX_ENTRY</td>
+      </tr>
+      <tr>
+        <td>0x0E</td>
+        <td>AddIndexEntryToAllocationBuffer</td>
+        <td>INDEX_ENTRY</td>
+      </tr>
+      <tr>
+        <td>0x0F</td>
+        <td>DeleteIndexEntryFromAllocationBuffer</td>
+        <td>INDEX_ENTRY</td>
+      </tr>
+      <tr>
+        <td>0x10</td>
+        <td>WriteEndOfIndexBuffer</td>
+        <td>INDEX_ENTRY</td>
+      </tr>
+      <tr>
+        <td>0x11</td>
+        <td>SetIndexEntryVcnInRoot</td>
+        <td>VCN</td>
+      </tr>
+      <tr>
+        <td>0x12</td>
+        <td>SetIndexEntryVcnInAllocationBuffer</td>
+        <td>VCN</td>
+      </tr>
+      <tr>
+        <td>0x13</td>
+        <td>UpdateFileNameInRoot</td>
+        <td>DUPLICATED_INFORMATION</td>
+      </tr>
+      <tr>
+        <td>0x14</td>
+        <td>UpdateFileNameInAllocationBuffer</td>
+        <td>DUPLICATED_INFORMATION</td>
+      </tr>
+      <tr>
+        <td>0x15</td>
+        <td>SetBitsInNonresidentBitMap</td>
+        <td>BITMAP_RANGE</td>
+      </tr>
+      <tr>
+        <td>0x16</td>
+        <td>ClearBitsInNonresidentBitMap</td>
+        <td>BITMAP_RANGE</td>
+      </tr>
+      <tr>
+        <td>0x17</td>
+        <td>HotFix</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x18</td>
+        <td>EndTopLevelAction</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x19</td>
+        <td>PrepareTransaction</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x1A</td>
+        <td>CommitTransaction</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x1B</td>
+        <td>ForgetTransaction</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x1C</td>
+        <td>OpenNonresidentAttribute</td>
+        <td>OPEN_ATTRIBUTE_ENTRY + ATTRIBUTE_NAME_ENTRY</td>
+      </tr>
+      <tr>
+        <td>0x1D</td>
+        <td>OpenAttributeTableDump</td>
+        <td>OPEN_ATTRIBUTE_ENTRY restart table</td>
+      </tr>
+      <tr>
+        <td>0x1E</td>
+        <td>AttributeNamesDump</td>
+        <td>ATTRIBUTE_NAME_ENTRY array</td>
+      </tr>
+      <tr>
+        <td>0x1F</td>
+        <td>DirtyPageTableDump</td>
+        <td>DIRTY_PAGE_ENTRY restart table</td>
+      </tr>
+      <tr>
+        <td>0x20</td>
+        <td>TransactionTableDump</td>
+        <td>TRANSACTION_ENTRY restart table</td>
+      </tr>
+      <tr>
+        <td>0x21</td>
+        <td>UpdateRecordDataInRoot</td>
+        <td>(value)</td>
+      </tr>
+      <tr>
+        <td>0x22</td>
+        <td>UpdateRecordDataInAllocationBuffer</td>
+        <td>(value)</td>
+      </tr>
+    </table>
 
-    <p>If the transaction is not realized (in case of e.g. power failure, or system
-    failure in general), the filesystem is in an undefined state. The only way for you to
-    put it back in a defined (and sane) state (this operation is called a roll-back) is
-    to log in a special file, the log file, which operations of the transaction have been
-    successfully completed.</p>
+    <h4>RESTART_TABLE header</h4>
+    <table border="1" summary="" cellspacing="0">
+      <tr>
+        <th>Offset</th>
+        <th>Size</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>0x00</td>
+        <td>2</td>
+        <td>EntrySize</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x02</td>
+        <td>2</td>
+        <td>NumberEntries</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x04</td>
+        <td>2</td>
+        <td>NumberAllocated</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x06</td>
+        <td>6</td>
+        <td>Padding</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x0C</td>
+        <td>4</td>
+        <td>FreeGoal</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x10</td>
+        <td>4</td>
+        <td>FirstFree</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x14</td>
+        <td>4</td>
+        <td>LastFree</td>
+        <td></td>
+      </tr>
+    </table>
 
-    <p>At the first access to the disk after a system failure, the system read the log
-    file and rolls back all the operations to the beginning of the last transaction.</p>
+    <h4>OPEN_ATTRIBUTE_ENTRY, NTFS v1.2, client v0.0</h4>
+    <table border="1" summary="" cellspacing="0">
+      <tr>
+        <th>Offset</th>
+        <th>Size</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>0x00</td>
+        <td>4</td>
+        <td>AllocatedOrNextFree</td>
+        <td>0xFFFFFFFF if the entry is allocated</td>
+      </tr>
+      <tr>
+        <td>0x04</td>
+        <td>4</td>
+        <td>PointerToAttributeName</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x08</td>
+        <td>8</td>
+        <td>FileReference</td>
+        <td>MFT_SEGMENT_REFERENCE</td>
+      </tr>
+      <tr>
+        <td>0x10</td>
+        <td>8</td>
+        <td>LsnOfOpenRecord</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x18</td>
+        <td>1</td>
+        <td>DirtyPagesSeen</td>
+        <td>Boolean</td>
+      </tr>
+      <tr>
+        <td>0x19</td>
+        <td>1</td>
+        <td>AttributeNamePresent</td>
+        <td>Boolean</td>
+      </tr>
+      <tr>
+        <td>0x1A</td>
+        <td>2</td>
+        <td>Padding</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x1C</td>
+        <td>4</td>
+        <td>AttributeTypeCode</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x20</td>
+        <td>8</td>
+        <td>AttributeName</td>
+        <td>UNICODE_STRING</td>
+      </tr>
+      <tr>
+        <td>0x28</td>
+        <td>4</td>
+        <td>BytesPerIndexBuffer</td>
+        <td>Meaningful if (AttributeTypeCode == IndexAllocation)</td>
+      </tr>
+    </table>
 
-    <ul>
-      <li>When the system writes to the log file, the operation must be atomic and
-      immediate.</li>
+    <h4>OPEN_ATTRIBUTE_ENTRY, NTFS v3.0+, client v0.0</h4>
+    <table border="1" summary="" cellspacing="0">
+      <tr>
+        <th>Offset</th>
+        <th>Size</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>0x00</td>
+        <td>4</td>
+        <td>AllocatedOrNextFree</td>
+        <td>0xFFFFFFFF if the entry is allocated</td>
+      </tr>
+      <tr>
+        <td>0x04</td>
+        <td>4</td>
+        <td>AttributeOffset</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x08</td>
+        <td>8</td>
+        <td>FileReference</td>
+        <td>MFT_SEGMENT_REFERENCE</td>
+      </tr>
+      <tr>
+        <td>0x10</td>
+        <td>8</td>
+        <td>LsnOfOpenRecord</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x18</td>
+        <td>4</td>
+        <td>Padding</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x1C</td>
+        <td>4</td>
+        <td>AttributeTypeCode</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x20</td>
+        <td>8</td>
+        <td>PointerToAttributeName</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x28</td>
+        <td>4</td>
+        <td>BytesPerIndexBuffer</td>
+        <td>Meaningful if (AttributeTypeCode == IndexAllocation)</td>
+      </tr>
+    </table>
 
-      <li>
-        You can put back your volume in sane state in a short time which is not related
-        to the size of your disk but only to the complexity of the transaction that
-        failed.
+    <h4>OPEN_ATTRIBUTE_ENTRY, NTFS v3.0+, client v1.0</h4>
+    <table border="1" summary="" cellspacing="0">
+      <tr>
+        <th>Offset</th>
+        <th>Size</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>0x00</td>
+        <td>4</td>
+        <td>AllocatedOrNextFree</td>
+        <td>0xFFFFFFFF if the entry is allocated</td>
+      </tr>
+      <tr>
+        <td>0x04</td>
+        <td>4</td>
+        <td>BytesPerIndexBuffer</td>
+        <td>Meaningful if (AttributeTypeCode == IndexAllocation)</td>
+      </tr>
+      <tr>
+        <td>0x08</td>
+        <td>4</td>
+        <td>AttributeTypeCode</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x0C</td>
+        <td>1</td>
+        <td>DirtyPagesSeen</td>
+        <td>Boolean</td>
+      </tr>
+      <tr>
+        <td>0x0D</td>
+        <td>3</td>
+        <td>Padding</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x10</td>
+        <td>8</td>
+        <td>FileReference</td>
+        <td>MFT_SEGMENT_REFERENCE</td>
+      </tr>
+      <tr>
+        <td>0x18</td>
+        <td>8</td>
+        <td>LsnOfOpenRecord</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x20</td>
+        <td>8</td>
+        <td>PointerToAttributeName</td>
+        <td></td>
+      </tr>
+    </table>
 
-        <p>Note: This operation is not performed by the Windows NT
-        chkdsk utility, but by the system: this normal and reliable
-        operation is a feature of NTFS.</p>
-      </li>
+    <h4>OPEN_ATTRIBUTE_ENTRY, NTFS v3.0+, client v1.0</h4>
+    <table border="1" summary="" cellspacing="0">
+      <tr>
+        <th>Offset</th>
+        <th>Size</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>0x00</td>
+        <td>4</td>
+        <td>AllocatedOrNextFree</td>
+        <td>0xFFFFFFFF if the entry is allocated</td>
+      </tr>
+      <tr>
+        <td>0x04</td>
+        <td>4</td>
+        <td>BytesPerIndexBuffer</td>
+        <td>Meaningful if (AttributeTypeCode == IndexAllocation)</td>
+      </tr>
+      <tr>
+        <td>0x08</td>
+        <td>4</td>
+        <td>AttributeTypeCode</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x0C</td>
+        <td>1</td>
+        <td>DirtyPagesSeen</td>
+        <td>Boolean</td>
+      </tr>
+      <tr>
+        <td>0x0D</td>
+        <td>3</td>
+        <td>Padding</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x10</td>
+        <td>8</td>
+        <td>FileReference</td>
+        <td>MFT_SEGMENT_REFERENCE</td>
+      </tr>
+      <tr>
+        <td>0x18</td>
+        <td>8</td>
+        <td>LsnOfOpenRecord</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x20</td>
+        <td>8</td>
+        <td>PointerToAttributeName</td>
+        <td></td>
+      </tr>
+    </table>
 
-      <li>If your hardware is reliable, you are sure that you always have access to all
-      the files of your volume, because it is consistent. But you can't restore eventual
-      data losses.</li>
-    </ul>
+    <h4>DIRTY_PAGE_ENTRY, client v0.0</h4>
+    <table border="1" summary="" cellspacing="0">
+      <tr>
+        <th>Offset</th>
+        <th>Size</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>0x00</td>
+        <td>4</td>
+        <td>AllocatedOrNextFree</td>
+        <td>0xFFFFFFFF if the entry is allocated</td>
+      </tr>
+      <tr>
+        <td>0x04</td>
+        <td>4</td>
+        <td>TargetAttributeOffset</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x08</td>
+        <td>4</td>
+        <td>LengthOfTransfer</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x0C</td>
+        <td>4</td>
+        <td>LCNsToFollow</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x10</td>
+        <td>4</td>
+        <td>Reserved</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x14</td>
+        <td>8</td>
+        <td>VCN</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x1C</td>
+        <td>8</td>
+        <td>OldestLsn</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x24</td>
+        <td>8 * LCNsToFollow</td>
+        <td>LCNsForPage</td>
+        <td>Array of LCNs (logical cluster number)</td>
+      </tr>
+    </table>
 
-    <pre>
-    Log file organization:
-    Two restart areas present in the first two pages (restart pages). When
-    the volume is unmounted they should be identical.
-    These are followed by log records organized in pages headed by a record
-    header going up to log file size. Not all pages contain log records when a
-    volume is first formatted, but as the volume ages, all records will be used.
-    When the log file fills up, the records at the beginning are purged (by
-    modifying the oldest_lsn to a higher value presumably) and writing begins
-    at the beginning of the file. Effectively, the log file is viewed as a
-    circular entity.
+    <h4>DIRTY_PAGE_ENTRY, client v1.0</h4>
+    <table border="1" summary="" cellspacing="0">
+      <tr>
+        <th>Offset</th>
+        <th>Size</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>0x00</td>
+        <td>4</td>
+        <td>AllocatedOrNextFree</td>
+        <td>0xFFFFFFFF if the entry is allocated</td>
+      </tr>
+      <tr>
+        <td>0x04</td>
+        <td>4</td>
+        <td>TargetAttributeOffset</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x08</td>
+        <td>4</td>
+        <td>LengthOfTransfer</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x0C</td>
+        <td>4</td>
+        <td>LCNsToFollow</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x10</td>
+        <td>8</td>
+        <td>VCN</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x18</td>
+        <td>8</td>
+        <td>OldestLsn</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x20</td>
+        <td>8 * LCNsToFollow</td>
+        <td>LCNsForPage</td>
+        <td>Array of LCNs (logical cluster number)</td>
+      </tr>
+    </table>
 
-    Log file restart page header (begins the restart area).
+    <h4>TRANSACTION_ENTRY</h4>
+    <table border="1" summary="" cellspacing="0">
+      <tr>
+        <th>Offset</th>
+        <th>Size</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>0x00</td>
+        <td>4</td>
+        <td>AllocatedOrNextFree</td>
+        <td>0xFFFFFFFF if the entry is allocated</td>
+      </tr>
+      <tr>
+        <td>0x04</td>
+        <td>4</td>
+        <td>TransactionState</td>
+        <td>Uninitialized = 0, Active = 1, Prepared = 2, Committed = 3,</td>
+      </tr>
+      <tr>
+        <td>0x08</td>
+        <td>8</td>
+        <td>FirstLsn</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x10</td>
+        <td>8</td>
+        <td>PreviousLsn</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x18</td>
+        <td>8</td>
+        <td>UndoNextLsn</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x18</td>
+        <td>8</td>
+        <td>OldestLsn</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x20</td>
+        <td>4</td>
+        <td>UndoRecords</td>
+        <td>Number of of undo log records pending abort</td>
+      </tr>
+      <tr>
+        <td>0x24</td>
+        <td>4</td>
+        <td>UndoBytes</td>
+        <td>Number of of bytes in undo log records pending abort</td>
+      </tr>
+    </table>
+    <p>
+        I am not sure of the circumstances requiring the transaction table to be written to disk, under normal circumstances the transaction table can be implied from the log records and is not explicitly written to disk.
+    </p>
 
-    struct {
-            NTFS_RECORD;                The magic is "RSTR".
-            __u64 chkdsk_lsn;        The check disk log file sequence number for
-                                       this restart page. Only used when the
-                                       magic is changed to "CHKD". = 0
-            __u32 system_page_size;        Byte size of system pages, has to be &gt;= 512
-                                       and a power of 2. Use this to calculate the
-                                       required size of the usa and add this to the
-                                       ntfs.usa_offset value. Then verify that the
-                                       result is less than the value of the
-                                       restart_offset. = 0x1000
-            __u32 log_page_size;        Byte size of log file records, has to be
-                                       &gt;= 512 and a power of 2. = 0x1000
-            __u16 restart_offset;        Byte offset from the start of the record to
-                                       the restart record. Value has to be aligned
-                                       to 8-byte boundary. = 0x30
-            __s16 minor_ver;        Log file minor version. Only check if major
-                                       version is 1. (=1 but &gt;=1 is treated the
-                                       same and &lt;=0 is also ok)
-            __u16 major_ver;        Log file major version (=1 but =0 is ok)
-    }  RESTART_PAGE_HEADER;
+    <h4>ATTRIBUTE_NAME_ENTRY</h4>
+    <table border="1" summary="" cellspacing="0">
+      <tr>
+        <th>Offset</th>
+        <th>Size</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>0x00</td>
+        <td>2</td>
+        <td>OpenAttributeOffset</td>
+        <td>Offset of the attibute with this name in the open attribute table</td>
+      </tr>
+      <tr>
+        <td>0x02</td>
+        <td>2</td>
+        <td>NameLength</td>
+        <td>In bytes</td>
+      </tr>
+      <tr>
+        <td>0x04</td>
+        <td>(NameLength + 1) * 2</td>
+        <td>Name</td>
+        <td>Null terminated</td>
+      </tr>
+    </table>
 
-    Log file restart area record. The offset of this record is found by adding
-    the offset of the RESTART_PAGE_HEADER to the restart_offset value found in
-    it.
+    <h3>LSN (logical sequence number)</h3>
+    <p>
+        The LSN is both the ID of an LFS record and the location of the record in the log file.
+    <p>
+    <p>
+        <div>To calculate the file offset of an LSN_RECORD given its LSN:</div>
+        <pre>FileOffset = ((lsn << SeqNumberBits) & 0xFFFFFFFFFFFFFFFF) >> (SeqNumberBits - 3)</pre>
+    </p>
 
-    struct {
-            __u64 current_lsn;        Log file record. = 0x700000, 0x700808
-            __u16 log_clients;        Number of log client records following
-                                       the restart_area. = 1
-            __u16 client_free_list;        How many clients are free(?). If != 0xffff,
-                                       check that log_clients &gt; client_free_list.
-                                       = 0xffff
-            __u16 client_in_use_list;How many clients are in use(?). If != 0xffff
-                                       check that log_clients &gt; client_in_use_list.
-                                       = 0
-            __u16 flags;                ??? = 0
-            __u32 seq_number_bits;        ??? = 0x2c or 0x2d
-            __u16 restart_area_length;Length of the restart area. Following
-                                       checks required if version matches.
-                                       Otherwise, skip them. restart_offset +
-                                       restart_area_length has to be &lt;lt;=
-                                       system_page_size. Also, restart_area_length
-                                       has to be &gt;= client_array_offset +
-                                       (log_clients * 0xa0). = 0xd0
-            __u16 client_array_offset;Offset from the start of this record to
-                                       the first client record if versions are
-                                       matched. The offset is otherwise assumed to
-                                       be (sizeof(RESTART_AREA) + 7) &amp; ~7, i.e.
-                                       rounded up to first 8-byte boundary. Either
-                                       way, the offset to the client array has to be
-                                       aligned to an 8-byte boundary. Also,
-                                       restart_offset + offset to the client array
-                                       have to be &lt;lt;= 510. Also, the offset to the
-                                       client array + (log_clients * 0xa0) have to
-                                       be &lt;lt;= SystemPageSize. = 0x30
-            __u64 file_size;        Byte size of the log file. If the
-                                       restart_offset + the offset of the file_size
-                                       are &gt; 510 then corruption has occured. This
-                                       is the very first check when starting with
-                                       the restart_area as if it fails it means
-                                       that some of the above values will be
-                                       corrupted by the multi sector transfer
-                                       protection! If the structure is deprotected
-                                       then these checks are futile of course.
-                                       Calculate the file_size bits and check that
-                                       seq_number_bits == 0x43 - file_size bits.
-                                       = 0x400000
-            __u32 last_lsn_data_length;??? = 0, 0x40
-            __u16 record_length;        Byte size of this record. If the version
-                                       matches then check that the value of
-                                       record_length is a multiple of 8, i.e.
-                                       (record_length + 7) &amp; ~7 == record_length.
-                                       = 0x30
-            __u16 log_page_data_offset;??? = 0x40
-    }  RESTART_AREA;
-
-    Log file client record. Starts at 0x58 even though AFAIU the above it should
-    start at 0x60. Something fishy is going on. /-:
-
-    struct {
-            __u64 oldest_lsn;        Oldest log file sequence number for this
-                                       client record. = 0xbd16951d
-            __u64 client_restart_lsn;??? = 0x700000, 0x700827, 0x700d07
-            __u16 prev_client;        ??? = 0x808, 0xd07, 0xd5d
-            __u16 next_client;        ??? = 0x70
-            __u16 seq_number;        ??? = 0, 4 size uncertain, Regis calls this
-                                       "volume clear flag" and gives a size of one
-                                       byte.
-            __u16 client_name;       ??? = empty string??? size uncertain
-    }  RESTART_CLIENT;
-
-    NOTE: Above client record is followed by 0xffffffff probably to indicate
-    the end of the restart area.
-    Then there are 8 bytes = 0, then one __u32 = 8, followed by the Unicode
-    string "NTFS" and then zeroes till the end of the page.
-    Is this important at all?
-
-    Log page record page header. Each log page begins with this header and is
-    followed by several LOG_RECORD structures.
-
-    struct {
-            NTFS_RECORD;                        The magic is "RCRD".
-            union {
-                    __u64 last_lsn;
-                    __u32 file_offset;
-            }  copy;
-            __u32 flags;
-            __u16 page_count;
-            __u16 page_position;
-            union {
-                    struct {
-                            __u64 next_record_offset;
-                            __u64 last_end_lsn;
-                    }  packed;
-            }  header;
-    }  RECORD_PAGE_HEADER;
-
-    Possible flags for log records.
-
-    enum {
-            LOG_RECORD_MULTI_PAGE = 1,        ???
-            LOG_RECORD_SIZE_PLACE_HOLDER = 0xffff,
-                    This has nothing to do with the log record. It is only so
-                       gcc knows to make the flags 16-bit.
-    }  LOG_RECORD_FLAGS;
-
-    Log record header.
-
-    struct {
-            __u64 this_lsn;
-            __u64 client_previous_lsn;
-            __u64 client_undo_next_lsn;
-            __u32 client_data_length;
-            struct {
-                    __u16 seq_number;
-                    __u16 client_index;
-            }  client_id;
-            __u32 record_type;
-            __u32 transaction_id;
-            LOG_RECORD_FLAGS flags;
-            __u16 reserved_or_alignment[3];
-    Now are at ofs 0x30 into struct.
-            __u16 redo_operation;
-            __u16 undo_operation;
-            __u16 redo_offset;
-            __u16 redo_length;
-            __u16 undo_offset;
-            __u16 undo_length;
-            __u16 target_attribute;
-            __u16 lcns_to_follow;                   Number of lcn_list entries following this entry.
-            __u16 record_offset;
-            __u16 attribute_offset;
-            __u32 alignment_or_reserved;
-            __u32 target_vcn;
-            __u32 alignment_or_reserved1;
-            struct {                           Only present if lcns_to_follow is not 0.
-                    __u32 lcn;
-                    __u32 alignment_or_reserved;
-            }  lcn_list[0];
-    }  LOG_RECORD;
-
-    The restart area (supposedly) has a pointer into the log area, such as
-    the first and last log records written and the last checkpoint record
-    written. If the restart area is screwed, recovery will be very hard -
-    therefore you have two copies of the restart areas.
-    Individual log records are identified by logical sequence numbers
-    (LSNs). The log area wraps around, but the LSNs don't (at least not
-    anytime soon), so they are used for identifying log records instead of
-    the offset in the log file.
-    Any modification of meta data (such as updating the time stamp that
-    the file system was opened) will result in log file actions, which in
-    turn result in restart area changes. It might well be that the dirty
-    bit is implicit rather than explicit: The file system is clean if the
-    last log record says that there are no pending transactions.
-    </pre>
-
+    <h3>NTFS Recovery</h3>
+    <h4>Analysis pass</h4>
+    <p>
+        <div>&bull; NTFS scans forward in log file from beginning of last checkpoint</div>
+        <div>&bull; Updates transaction/dirty page tables it copied in memory</div>
+        <div>&bull; NTFS scans tables for oldest update record of a non-committed transactions</div>
+    </p>
+    <h4>Redo pass</h4>
+    <p>
+        <div>&bull; NTFS looks for "page update" records which contain volume modification that might not have been flushed to disk</div>
+        <div>&bull; NTFS redoes these updates in the cache until it reaches end of log file</div>
+        <div>&bull; Cache manager "lazy writer thread" begins to flush cache to disk</div>
+    </p>
+    <h4>Undo pass</h4>
+    <p>
+        <div>&bull; Roll back any transactions that weren't committed when system failed</div>
+        <div>&bull; After undo pass - volume is at consistent state</div>
+        <div>&bull; Write empty LFS restart area; no recovery is needed if system fails now</div>
+    </p>
     <br />
     <a class="contact" href="../help/license.html">Copyright &copy;</a>
   <script type="text/javascript" src="../analytics.js"></script>
