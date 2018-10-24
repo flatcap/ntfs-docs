@@ -1087,64 +1087,6 @@
       </tr>
     </table>
 
-    <h4>OPEN_ATTRIBUTE_ENTRY, NTFS v3.0+, client v1.0</h4>
-    <table border="1" summary="" cellspacing="0">
-      <tr>
-        <th>Offset</th>
-        <th>Size</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-      <tr>
-        <td>0x00</td>
-        <td>4</td>
-        <td>AllocatedOrNextFree</td>
-        <td>0xFFFFFFFF if the entry is allocated</td>
-      </tr>
-      <tr>
-        <td>0x04</td>
-        <td>4</td>
-        <td>BytesPerIndexBuffer</td>
-        <td>Meaningful if (AttributeTypeCode == IndexAllocation)</td>
-      </tr>
-      <tr>
-        <td>0x08</td>
-        <td>4</td>
-        <td>AttributeTypeCode</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>0x0C</td>
-        <td>1</td>
-        <td>DirtyPagesSeen</td>
-        <td>Boolean</td>
-      </tr>
-      <tr>
-        <td>0x0D</td>
-        <td>3</td>
-        <td>Padding</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>0x10</td>
-        <td>8</td>
-        <td>FileReference</td>
-        <td>MFT_SEGMENT_REFERENCE</td>
-      </tr>
-      <tr>
-        <td>0x18</td>
-        <td>8</td>
-        <td>LsnOfOpenRecord</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>0x20</td>
-        <td>8</td>
-        <td>PointerToAttributeName</td>
-        <td></td>
-      </tr>
-    </table>
-
     <h4>DIRTY_PAGE_ENTRY, client v0.0</h4>
     <table border="1" summary="" cellspacing="0">
       <tr>
@@ -1273,7 +1215,7 @@
         <td>0x04</td>
         <td>4</td>
         <td>TransactionState</td>
-        <td>Uninitialized = 0, Active = 1, Prepared = 2, Committed = 3,</td>
+        <td>Uninitialized = 0, Active = 1, Prepared = 2, Committed = 3</td>
       </tr>
       <tr>
         <td>0x08</td>
