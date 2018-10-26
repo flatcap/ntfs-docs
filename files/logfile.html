@@ -177,7 +177,7 @@
         <td>0x10</td>
         <td>4</td>
         <td>SeqNumberBits</td>
-        <td></td>
+        <td>SeqNumberBits = 64 - (FileSizeBits - 3), where FileSizeBits is the number of bits chosen to represent the log file size (greater than or equal to the number of bits needed)</td>
       </tr>
       <tr>
         <td>0x14</td>
@@ -779,12 +779,12 @@
       </tr>
       <tr>
         <td>0x15</td>
-        <td>SetBitsInNonresidentBitMap</td>
+        <td>SetBitsInNonResidentBitMap</td>
         <td>BITMAP_RANGE</td>
       </tr>
       <tr>
         <td>0x16</td>
-        <td>ClearBitsInNonresidentBitMap</td>
+        <td>ClearBitsInNonResidentBitMap</td>
         <td>BITMAP_RANGE</td>
       </tr>
       <tr>
@@ -814,7 +814,7 @@
       </tr>
       <tr>
         <td>0x1C</td>
-        <td>OpenNonresidentAttribute</td>
+        <td>OpenNonResidentAttribute</td>
         <td>OPEN_ATTRIBUTE_ENTRY + ATTRIBUTE_NAME_ENTRY</td>
       </tr>
       <tr>
@@ -931,7 +931,7 @@
         <td>0x10</td>
         <td>8</td>
         <td>LsnOfOpenRecord</td>
-        <td></td>
+        <td>This is the LSN of the client record preceding the OpenNonResidentAttribute record</td>
       </tr>
       <tr>
         <td>0x18</td>
