@@ -815,7 +815,7 @@
       <tr>
         <td>0x1C</td>
         <td>OpenNonResidentAttribute</td>
-        <td>OPEN_ATTRIBUTE_ENTRY + ATTRIBUTE_NAME_ENTRY</td>
+        <td>OPEN_ATTRIBUTE_ENTRY (The attribute name is stored in the UndoData field)</td>
       </tr>
       <tr>
         <td>0x1D</td>
@@ -919,7 +919,7 @@
         <td>0x04</td>
         <td>4</td>
         <td>PointerToAttributeName</td>
-        <td></td>
+        <td>This value is used by the live system and should be ignored when read from disk</td>
       </tr>
       <tr>
         <td>0x08</td>
@@ -961,7 +961,7 @@
         <td>0x20</td>
         <td>8</td>
         <td>AttributeName</td>
-        <td>UNICODE_STRING</td>
+        <td>UNICODE_STRING, This value is used by the live system and should be ignored when read from disk</td>
       </tr>
       <tr>
         <td>0x28</td>
@@ -1019,7 +1019,7 @@
         <td>0x20</td>
         <td>8</td>
         <td>PointerToAttributeName</td>
-        <td></td>
+        <td>This value is used by the live system and should be ignored when read from disk</td>
       </tr>
       <tr>
         <td>0x28</td>
@@ -1083,7 +1083,7 @@
         <td>0x20</td>
         <td>8</td>
         <td>PointerToAttributeName</td>
-        <td></td>
+        <td>This value is used by the live system and should be ignored when read from disk</td>
       </tr>
     </table>
 
@@ -1283,6 +1283,28 @@
         <td>(NameLength + 1) * 2</td>
         <td>Name</td>
         <td>Null terminated</td>
+      </tr>
+    </table>
+
+    <h4>BITMAP_RANGE</h4>
+    <table border="1" summary="" cellspacing="0">
+      <tr>
+        <th>Offset</th>
+        <th>Size</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>0x00</td>
+        <td>4</td>
+        <td>BitmapOffset</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>0x04</td>
+        <td>4</td>
+        <td>NumberOfBits</td>
+        <td></td>
       </tr>
     </table>
 
