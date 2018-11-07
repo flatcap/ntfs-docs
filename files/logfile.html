@@ -64,10 +64,11 @@
     <h3>Unnamed Data Stream</h3>
 
     <p>
-    At the beginning of the log files are two LFS_RESTART_PAGE pages, 4KB each,    the second is a backup in case the first becomes corrupt, and the two will be identical if the volume is cleanly dismounted.
+    At the beginning of the log files are two LFS_RESTART_PAGE pages, 4KB each, CurrentLsn should be used to determine which is more recent.
+    There are two restart pages because one of them may become corrupt if there is a power failure during write. (Note: the NTFS v5.1 driver will write two identical copies when the volume is cleanly dismounted).
     The rest of the log file comprised of a series of LFS_RECORD_PAGE pages, the size of each page is specified in the LFS_RESTART_AREA structure.
     <br/>
-    As of LFS v1.1 (The latest version as of this writing, being used from Windows NT 4.0 onwards), the first two pages have special purpose and are called tail pages, the rest of the pages are sometimes called regular pages.
+    As of LFS v1.1 (The latest version as of this writing, being used from Windows NT 4.0 onwards), the first two pages have special purpose and are called tail pages or tail copies, the rest of the pages are sometimes called regular pages.
     The tail pages are used for backup purposes, and in some circumstances may contain information that haven't yet been written to the regular log area.
     </p>
 
@@ -323,7 +324,7 @@
         <td>0x18</td>
         <td>2</td>
         <td>NextRecordOffset</td>
-        <td>The offset of the free space in the page, if the last record has MultiPage flag set this value is not incremented and will point to the start of the record.</td>
+        <td>The offset of the free space in the page, if the last record does not end on this page then this value is not incremented and will point to the start of the record.</td>
       </tr>
       <tr>
         <td>0x1A</td>
@@ -1315,6 +1316,17 @@
     <p>
         <div>To calculate the file offset of an LSN_RECORD given its LSN:</div>
         <pre>FileOffset = ((lsn << SeqNumberBits) & 0xFFFFFFFFFFFFFFFF) >> (SeqNumberBits - 3)</pre>
+    </p>
+
+    <h3>Tail pages</h3>
+    <p>
+        In LFS v1.1, the log pages are packed, meaning that if we have room on the last page written (in a previous IO transfer), then records from the current IO transfer will be added to it.
+        To avoid losing both the records from the previous IO transfer and the current one if the page becomes corrupt due to a power failue, two special pages called tail copies are used.
+    <p>
+        Note that only the first page and the last page of an IO transfer may have tail copies (the pages in between never puts us at risk).
+    </p>
+    <p>
+        Two copies are not strictly needed but may be useful for some implementations.
     </p>
 
     <h3>NTFS Recovery</h3>
