@@ -160,13 +160,13 @@
         <td>0x0A</td>
         <td>2</td>
         <td>ClientFreeList</td>
-        <td> The index of the first free log client record in the array</td>
+        <td> The index of the first free log client record in LogClientArray (NoClient = 0xFFFF)</td>
       </tr>
       <tr>
         <td>0x0C</td>
         <td>2</td>
         <td>ClientInUseList</td>
-        <td>The index of the first in-use log client record in the array</td>
+        <td>The index of the first in-use log client record in LogClientArray (NoClient = 0xFFFF)</td>
       </tr>
       <tr>
         <td>0x0E</td>
@@ -184,7 +184,7 @@
         <td>0x14</td>
         <td>2</td>
         <td>RestartAreaLength</td>
-        <td></td>
+        <td>Length of this structure including LogClientArray</td>
       </tr>
       <tr>
         <td>0x16</td>
@@ -225,8 +225,8 @@
       <tr>
         <td>ClientArrayOffset</td>
         <td>Variable</td>
-        <td>LFS_CLIENT_RECORD array</td>
-        <td>Array of clients who are using this log file (currently the only client is NTFS itself)</td>
+        <td>LogClientArray</td>
+        <td>LFS_CLIENT_RECORD array of clients who are using this log file (currently the only client is NTFS itself)</td>
       </tr>
     </table>
 
@@ -254,13 +254,19 @@
         <td>0x10</td>
         <td>2</td>
         <td>PrevClient</td>
-        <td></td>
+        <td>The index of the next client in LogClientArray (NoClient = 0xFFFF)</td>
+      </tr>
+	  <tr>
+        <td>0x12</td>
+        <td>2</td>
+        <td>NextClient</td>
+        <td>The index of the next client in LogClientArray (NoClient = 0xFFFF)</td>
       </tr>
       <tr>
         <td>0x14</td>
-        <td>4</td>
-        <td>NextClient</td>
-        <td></td>
+        <td>2</td>
+        <td>SeqNumber</td>
+        <td>Client sequence number</td>
       </tr>
       <tr>
         <td>0x16</td>
@@ -276,7 +282,7 @@
       </tr>
       <tr>
         <td>0x20</td>
-        <td>Variable</td>
+        <td>128</td>
         <td>ClientName</td>
         <td></td>
       </tr>
